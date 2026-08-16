@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://ddsfbd32oklf0"]
+
+[ext_resource type="Script" uid="uid://bx4yd7iyg7mwu" path="res://Features/Map/Scenes/FrameCell/FrameCell.cs" id="1_mqaa4"]
+[ext_resource type="Texture2D" uid="uid://dgt2olwkf4krh" path="res://Assets/Textures/FrameCell/center.png" id="2_mqaa4"]
+
+[node name="FrameCell" type="Node2D" unique_id=1070001311]
+script = ExtResource("1_mqaa4")
+
+[node name="Object" type="Sprite2D" parent="." unique_id=1663005384]
+texture = ExtResource("2_mqaa4")

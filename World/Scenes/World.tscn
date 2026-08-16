@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://r4l72ri2c43q"]
+
+[ext_resource type="Texture2D" uid="uid://bwf6fipg7ofik" path="res://Assets/Textures/Background/Bg_lv1.jpg" id="1_27urg"]
+
+[node name="World" type="CanvasLayer" unique_id=1567657222]
+
+[node name="Background" type="TextureRect" parent="." unique_id=575782208]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_27urg")

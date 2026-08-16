@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dbxxv6p0b6vmd"]
+
+[ext_resource type="Script" uid="uid://b4irssr1kxhow" path="res://Features/Map/Scenes/StoneCell/StoneCell.cs" id="1_3fsl5"]
+[ext_resource type="Texture2D" uid="uid://c2aioikokkgqu" path="res://Assets/Textures/StoneCell/cell_gray.png" id="1_wgtb8"]
+[ext_resource type="Texture2D" uid="uid://b5k0ic73k1qxh" path="res://Assets/Textures/StoneCell/cell_highlight.png" id="2_afxdg"]
+
+[node name="StoneCell" type="Node2D" unique_id=2084727990]
+script = ExtResource("1_3fsl5")
+
+[node name="Object" type="Sprite2D" parent="." unique_id=109253051]
+texture = ExtResource("1_wgtb8")
+
+[node name="highlight" type="Sprite2D" parent="." unique_id=1673153494]
+modulate = Color(1, 1, 1, 0)
+z_index = 1
+texture = ExtResource("2_afxdg")

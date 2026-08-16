@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dodw3fltxycss"]
+
+[ext_resource type="Texture2D" uid="uid://85k77mrd3xpv" path="res://Assets/Textures/Seals/seal_blue.png" id="1_0eada"]
+[ext_resource type="Script" uid="uid://cmegio1jgo50g" path="res://Features/Map/Scenes/Seal/Seal.cs" id="1_m0muf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bnnr1"]
+size = Vector2(153, 154)
+
+[node name="Seal" type="Area2D" unique_id=1210145361]
+script = ExtResource("1_m0muf")
+
+[node name="Object" type="Sprite2D" parent="." unique_id=762299255]
+texture = ExtResource("1_0eada")
+
+[node name="Collision" type="CollisionShape2D" parent="." unique_id=2147456407]
+position = Vector2(0.5, 0)
+shape = SubResource("RectangleShape2D_bnnr1")
