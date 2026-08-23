@@ -6,21 +6,20 @@ using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
-    public class SwapCommand(MapContextModel ctx, Vector2I from, Vector2I to)
+    public class SwapCommand(MapContextModel ctx, Vector2I from, Vector2I to) : ICommand
     {
         private readonly MapContextModel _ctx = ctx;
         private readonly Vector2I _from = from;
         private readonly Vector2I _to = to;
 
-        public async Task ExecuteAync(bool undo = false)
+        public async Task ExecuteAync()
         {
-            if(undo == false)
-            {
-                await PlaySwap(_from, _to);
-            } else
-            {
-                await PlaySwap(_to, _from);
-            }
+            await PlaySwap(_from, _to);
+        }
+
+        public async Task Undo()
+        {
+            await PlaySwap(_to, _from);
         }
 
         private async Task PlaySwap(Vector2I from, Vector2I to, bool undo = false)

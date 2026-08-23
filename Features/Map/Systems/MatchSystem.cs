@@ -25,38 +25,30 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 if(currentSeal != null)
                 {
                     var type = currentSeal.Model.Type;
-                    matches[type] = [];
+                    HashSet<SealModel> tempMatches = [];
 
                     for (int x = 0; x < ctx.Width - 2; x++)
                     {
-                        var s1 = ctx.SealViews[new Vector2I(x, currentSeal.Model.Y)].Model;
-                        var s2 = ctx.SealViews[new Vector2I(x + 1, currentSeal.Model.Y)].Model;
-                        var s3 = ctx.SealViews[new Vector2I(x + 2, currentSeal.Model.Y)].Model;
-                        if (s1 != null && s2 != null && s3 != null)
-                        {
-                            if (IsSametype(s1, s2, type) && IsSametype(s2, s3, type))
-                            {
-                               matches[type].Add(s1);
-                               matches[type].Add(s2);
-                               matches[type].Add(s3);
-                            }
-                        }
+                        var s1 = ctx.SealViews[new Vector2I(x, currentSeal.Model.Y)];
+                        var s2 = ctx.SealViews[new Vector2I(x + 1, currentSeal.Model.Y)];
+                        var s3 = ctx.SealViews[new Vector2I(x + 2, currentSeal.Model.Y)];
+
+                        tempMatches.UnionWith(addMatches(s1, s2, s3, type));
                     }
 
                     for(int y = 0; y < ctx.Height - 2; y++)
                     {
-                        var s1 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y)].Model;
-                        var s2 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 1)].Model;
-                        var s3 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 2)].Model;
-                        if (s1 != null && s2 != null && s3 != null)
-                        {
-                            if (IsSametype(s1, s2, type) && IsSametype(s2, s3, type))
-                            {
-                                matches[type].Add(s1);
-                                matches[type].Add(s2);
-                                matches[type].Add(s3);
-                            }
-                        }
+                        var s1 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y)];
+                        var s2 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 1)];
+                        var s3 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 2)];
+
+                        tempMatches.UnionWith(addMatches(s1, s2, s3, type));
+
+                    }
+
+                    if(tempMatches.Count >= 3)
+                    {
+                        matches[type] = tempMatches;
                     }
 
                     currentSeal = null;
@@ -64,6 +56,29 @@ namespace TheDragonsPuzzleSeals.Features.Map
             }
 
             return matches;
+        }
+
+        private static HashSet<SealModel> addMatches(Seal s1, Seal s2, Seal s3, SealType type)
+        {
+            HashSet<SealModel> tempMatches = [];
+            if (s1 != null && s2 != null && s3 != null)
+            {
+                var m1 = s1.Model;
+                var m2 = s2.Model;
+                var m3 = s3.Model;
+
+                if (m1 != null && m2 != null && m3 != null)
+                {
+                    if (IsSametype(m1, m2, type) && IsSametype(m2, m3, type))
+                    {
+                        tempMatches.Add(m1);
+                        tempMatches.Add(m2);
+                        tempMatches.Add(m3);
+                    }
+                }
+            }
+
+            return tempMatches;
         }
 
         public static bool HasMatches(Dictionary<SealType, HashSet<SealModel>> matches)

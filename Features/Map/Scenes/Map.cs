@@ -1,8 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
@@ -161,18 +159,19 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 var swapFrom = new Vector2I(currentX, currentY);
                 var swapTo = new Vector2I(targetX, targetY);
 
-                SwapCommand swapCommand = new SwapCommand(_ctx, swapFrom, swapTo);
-                await swapCommand.ExecuteAync(undo: false);
+                SwapCommand swapCommand = new (_ctx, swapFrom, swapTo);
+                await swapCommand.ExecuteAync();
 
-                // Find matches
+                // Finding matches
                 Dictionary<SealType, HashSet<SealModel>> matches = MatchSystem.findMatch(_ctx);
 
+                // Processing matches
                 if(MatchSystem.HasMatches(matches))
                 {
-                    await ProcessMatch();
+                    await ProcessMatch(matches);
                 } else
                 {
-                    await swapCommand.ExecuteAync(undo: true);
+                    await swapCommand.Undo();
                 }
 
 
@@ -183,9 +182,27 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
         }
 
-        private async Task ProcessMatch()
+        private async Task ProcessMatch(Dictionary<SealType, HashSet<SealModel>> originalMatches)
         {
+            Dictionary<SealType, HashSet<SealModel>> initMatches = originalMatches;
+            while(initMatches.Count > 0)
+            {
+                foreach(var (key, matches) in initMatches)
+                {
+                   /* if(matches != null && matches.Count == 3)
+                    {
+                        DestroyCommand destroyCommand = new(_ctx, matches);
+                        await destroyCommand.ExecuteAync();
+                        initMatches.Remove(key);
+                    } */
 
+                    DestroyCommand destroyCommand = new(_ctx, matches);
+                    await destroyCommand.ExecuteAync();
+                    initMatches.Remove(key);
+                }
+
+                //initMatches = MatchSystem.findMatch(_ctx);
+            }
         }
 
         /// <summary>
