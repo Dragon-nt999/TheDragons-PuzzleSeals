@@ -15,10 +15,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public int Width { get; init; }
         public int Height { get; init; }
         public Func<int, int, Vector2> ConvertPosition { get; init; }
-
         public Dictionary<Vector2I, Seal> SealViews = [];
-
-        public Dictionary<string, Vector2I> SwapData = [];
     }
 
 }

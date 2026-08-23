@@ -24,7 +24,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private float _offsetY;
 
         private MapObjectModel[,] _mapData;
-        //private readonly Dictionary<Vector2I, Seal> _sealViews = [];
 
         private Seal _seletedSeal;
         private Vector2 _startPostion;
@@ -142,26 +141,45 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 return;
             }
 
-            int currentX = _seletedSeal.Model.X;
-            int currentY = _seletedSeal.Model.Y;
-            int targetX = currentX;
-            int targetY = currentY;
-
-            if(MathF.Abs(distance.X) > MathF.Abs(distance.Y))
+            if ((_seletedSeal.Model.X >= 0 && _seletedSeal.Model.X < _width)
+                    && (_seletedSeal.Model.Y >= 0 && _seletedSeal.Model.Y < _height))
             {
-                targetX += distance.X > 0 ? 1 : -1;
-            }
-            else
-            {
-                targetY += distance.Y > 0 ? 1 : -1;
-            }
-            _seletedSeal = null;
+                int currentX = _seletedSeal.Model.X;
+                int currentY = _seletedSeal.Model.Y;
+                int targetX = currentX;
+                int targetY = currentY;
 
-            // Swaping seals
-            _ctx.SwapData.Add("current", new Vector2I(currentX, currentY));
-            _ctx.SwapData.Add("target", new Vector2I(targetX, targetY));
-            SwapCommand swapCommand = new SwapCommand(_ctx);
-            await swapCommand.ExecuteAync();
+                if (MathF.Abs(distance.X) > MathF.Abs(distance.Y))
+                {
+                    targetX += distance.X > 0 ? 1 : -1;
+                }
+                else
+                {
+                    targetY += distance.Y > 0 ? 1 : -1;
+                }
+
+                var swapFrom = new Vector2I(currentX, currentY);
+                var swapTo = new Vector2I(targetX, targetY);
+
+                SwapCommand swapCommand = new SwapCommand(_ctx, swapFrom, swapTo);
+                await swapCommand.ExecuteAync();
+
+                // Find matches
+                Dictionary<SealType, HashSet<SealModel>> matches = MatchSystem.findMatch(_ctx);
+
+                if(matches.Count > 0)
+                {
+
+                } else
+                {
+                    await swapCommand.Undo();
+                }
+
+
+                // Reset Swap
+                _seletedSeal = null;
+            }
+            
 
         }
 

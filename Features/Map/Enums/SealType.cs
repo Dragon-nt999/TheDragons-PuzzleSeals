@@ -10,4 +10,11 @@ namespace TheDragonsPuzzleSeals.Features.Map
         green,
         yellow
     }
+
+    public enum SealAction
+    {
+        Swap,
+        Fall,
+        Explosion,
+    }
 }
