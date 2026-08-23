@@ -1,13 +1,14 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public static class SpawnSystem
     {
-        public static SealModel[,] GenerateMap(int width, int height)
+        public static Dictionary<Vector2I, SealModel> SpawnSeals(MapObjectModel[,] map)
         {
-            SealModel[,] map     = new SealModel[width, height];
+            Dictionary<Vector2I, SealModel> seals = [];
             Random rand          = new Random();
             SealType[] poolType  = new SealType[]
             {
@@ -17,28 +18,27 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 SealType.yellow,
             };
 
-            for(var x = 0; x < width; x++)
+            foreach(var obj in map)
             {
-                for(var y = 0; y < height; y++)
+                SealType type;
+
+                do
                 {
-                    SealType type;
+                    type = poolType[rand.Next(poolType.Length)];
+                } while (
+                            (obj.X >= 2 && seals[new Vector2I(obj.X - 1, obj.Y)].Type 
+                                                   == type && seals[new Vector2I(obj.X - 2, obj.Y)].Type == type)
+                          ||
+                            (obj.Y >= 2 && seals[new Vector2I(obj.X, obj.Y - 1)].Type 
+                                                   == type && seals[new Vector2I(obj.X, obj.Y - 2)].Type == type));
 
-                    do
-                    {
-                        type = poolType[rand.Next(poolType.Length)];
-
-                    } while (
-                                (x >= 2 && map[x - 1, y].Type == type && map[x - 2, y].Type == type)
-                              ||
-                                (y >= 2 && map[x, y - 1].Type == type && map[x, y - 2].Type == type));
-
-                    map[x, y] = new SealModel(x, y, type);
-                }
+                seals[new Vector2I(obj.X, obj.Y)] = new SealModel(obj.X, obj.Y, type);
             }
 
-            return map;
+            return seals;
         }
 
+        
 
     }
 

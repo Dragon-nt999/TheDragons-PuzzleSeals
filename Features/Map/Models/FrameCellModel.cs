@@ -3,16 +3,10 @@ using System;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
-    public class FrameSealModel
+    public class FrameSealModel(string texturePath, Vector2 pos)
     {
-        public Vector2 Position;
-        public string TexturePath;
-
-        public FrameSealModel(string texturePath, Vector2 pos)
-        {
-            TexturePath = texturePath;
-            Position = pos;
-        }
+        public string TexturePath { get; } = texturePath;
+        public Vector2 Position { get; } = pos;
     }
 
 }

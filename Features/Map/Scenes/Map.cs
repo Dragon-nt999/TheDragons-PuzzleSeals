@@ -1,5 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
@@ -20,8 +23,17 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private float _offsetX;
         private float _offsetY;
 
-        private SealModel[,] _mapData;
-        private Seal[,] _sealData;
+        private MapObjectModel[,] _mapData;
+        //private readonly Dictionary<Vector2I, Seal> _sealViews = [];
+
+        private Seal _seletedSeal;
+        private Vector2 _startPostion;
+
+        private MapRenderService _renderService;
+
+        private const float SwipeThreshold = 35.0f;
+
+        private MapContextModel _ctx; 
 
         public override async void _Ready()
         {
@@ -31,6 +43,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             // Wait one frame for the parent container to calculate its actual size
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
+            // Calculate Seal size, offset
             Vector2 mapSize = _mapArea.Size;
 
             _sealSize = Mathf.Floor(Mathf.Min(
@@ -49,12 +62,13 @@ namespace TheDragonsPuzzleSeals.Features.Map
             _offsetX = (mapSize.X - mapWidth) / 2f;
             _offsetY = (mapSize.Y - mapHeight) / 2f;
 
-            _mapData = SpawnSystem.GenerateMap(_width, _height);
-            _sealData = new Seal[_width, _height];
+            // Create Map
+            CreateMap();
 
-            if (_mapData == null) return;
+            if (_mapData == null || _mapData.Length <= 0) return;
 
-            MapContextModel ctx = new MapContextModel
+            // Initial Map Contex for Render, Animation, Commands
+            _ctx = new MapContextModel
             {
                 Node            = this,
                 SealScene       = SealScene,
@@ -64,24 +78,115 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 SealSize        = _sealSize,
                 Width           = _width,
                 Height          = _height,
-                ConvertPosition = converPostion,
-                SealData        = _sealData,
+                ConvertPosition = ConvertPostion
             };
 
             // Render
-            MapRenderService render = new MapRenderService(ctx);
-            render.Render();
-
-            // Command
+            _renderService = new MapRenderService(_ctx);
+            if(_renderService != null)
+            {
+                _renderService.Render();
+                _renderService.SealTouched += OnSealTouched;
+            }
 
         }
 
-        private Vector2 converPostion(int x, int y)
+        /// <summary>
+        /// Calculate position Seal or somethings else from SealMode[X, Y]
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        private Vector2 ConvertPostion(int x, int y)
         {
             float xPos = x * _sealSize + _offsetX + (_sealSize / 2);
             float yPos = y * _sealSize + _offsetY + (_sealSize / 2);
 
             return new Vector2(xPos, yPos);
+        }
+
+        /// <summary>
+        /// Helper for assign seal, postion from Seal's Signal
+        /// </summary>
+        /// <param name="seal"></param>
+        /// <param name="startPosition"></param>
+        private void OnSealTouched(Seal seal, Vector2 startPosition)
+        {
+            _seletedSeal = seal;
+            _startPostion = startPosition;
+        }
+
+        /// <summary>
+        /// Handle click or touch events
+        /// get seal, position from Seal's Signal
+        /// </summary>
+        /// <param name="event"></param>
+        public override async void _UnhandledInput(InputEvent @event)
+        {
+            if(@event is InputEventMouseButton mouseButton
+                            && mouseButton.ButtonIndex == MouseButton.Left)
+            {
+                if(!mouseButton.Pressed && _seletedSeal != null)
+                {
+                    await HandleSwipe(mouseButton.Position);
+                }
+            }  
+        }
+
+        private async Task HandleSwipe(Vector2 endPosition)
+        {
+            Vector2 distance = endPosition - _startPostion;
+            if(distance.Length() < SwipeThreshold)
+            {
+                _seletedSeal = null;
+                return;
+            }
+
+            int currentX = _seletedSeal.Model.X;
+            int currentY = _seletedSeal.Model.Y;
+            int targetX = currentX;
+            int targetY = currentY;
+
+            if(MathF.Abs(distance.X) > MathF.Abs(distance.Y))
+            {
+                targetX += distance.X > 0 ? 1 : -1;
+            }
+            else
+            {
+                targetY += distance.Y > 0 ? 1 : -1;
+            }
+            _seletedSeal = null;
+
+            // Swaping seals
+            _ctx.SwapData.Add("current", new Vector2I(currentX, currentY));
+            _ctx.SwapData.Add("target", new Vector2I(targetX, targetY));
+            SwapCommand swapCommand = new SwapCommand(_ctx);
+            await swapCommand.ExecuteAync();
+
+        }
+
+        /// <summary>
+        /// Create Map base on widh, height
+        /// </summary>
+        private void CreateMap()
+        {
+            _mapData = new MapObjectModel[_width, _height];
+            for (var x = 0; x < _width; x++)
+            {
+                for (var y = 0; y < _height; y++)
+                {
+                    _mapData[x, y] = new MapObjectModel(x, y);
+                }
+            }
+        }
+
+        public override void _ExitTree()
+        {
+            if(_renderService != null)
+            {
+                _renderService.SealTouched -= OnSealTouched;
+                _renderService.Clear();
+            }
         }
     }
 }
