@@ -12,49 +12,34 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private readonly Vector2I _from = from;
         private readonly Vector2I _to = to;
 
-        public async Task ExecuteAync()
+        public async Task ExecuteAync(bool undo = false)
         {
-            //Seal seal1 = _ctx.SealViews[from];
-            //Seal seal2 = _ctx.SealViews[to];
-            //Vector2 target1 = _ctx.ConvertPosition(from.X, from.Y);
-            //Vector2 target2 = _ctx.ConvertPosition(to.X, to.Y);
-
-            //seal1.Model.Action = SealAction.Swap;
-            //seal2.Model.Action = SealAction.Swap;
-
-            //SwapSeal(from, to);
-
-            //await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
-
-            await PlaySwap(_from, _to);
+            if(undo == false)
+            {
+                await PlaySwap(_from, _to);
+            } else
+            {
+                await PlaySwap(_to, _from);
+            }
         }
 
-        public async Task Undo()
-        {
-            /*Seal seal1 = _ctx.SealViews[oldCurrent];
-            Seal seal2 = _ctx.SealViews[oldTarget];
-            Vector2 target1 = _ctx.ConvertPosition(oldCurrent.X, oldCurrent.Y);
-            Vector2 target2 = _ctx.ConvertPosition(oldTarget.X, oldTarget.Y);
-
-            seal1.Model.Action = SealAction.Swap;
-            seal2.Model.Action = SealAction.Swap;
-
-            SwapSeal(oldCurrent, oldTarget);
-
-            await MapAnimService.PlaySwap(seal1, seal2, target1, target2);*/
-            await PlaySwap(_to, _from);
-        }
-
-        private async Task PlaySwap(Vector2I from, Vector2I to)
+        private async Task PlaySwap(Vector2I from, Vector2I to, bool undo = false)
         {
             Seal seal1 = _ctx.SealViews[from];
             Seal seal2 = _ctx.SealViews[to];
             Vector2 target1 = _ctx.ConvertPosition(from.X, from.Y);
             Vector2 target2 = _ctx.ConvertPosition(to.X, to.Y);
 
-            seal1.Model.Action = SealAction.Swap;
-            seal2.Model.Action = SealAction.Swap;
-
+            if(undo == false)
+            {
+                seal1.Model.Action = SealAction.Swap;
+                seal2.Model.Action = SealAction.Swap;
+            } else
+            {
+                seal1.Model.Action = null;
+                seal2.Model.Action = null;
+            }
+            
             await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
 
             SwapSeal(from, to);

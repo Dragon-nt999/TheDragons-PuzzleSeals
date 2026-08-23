@@ -162,17 +162,17 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 var swapTo = new Vector2I(targetX, targetY);
 
                 SwapCommand swapCommand = new SwapCommand(_ctx, swapFrom, swapTo);
-                await swapCommand.ExecuteAync();
+                await swapCommand.ExecuteAync(undo: false);
 
                 // Find matches
                 Dictionary<SealType, HashSet<SealModel>> matches = MatchSystem.findMatch(_ctx);
 
-                if(matches.Count > 0)
+                if(MatchSystem.HasMatches(matches))
                 {
-
+                    await ProcessMatch();
                 } else
                 {
-                    await swapCommand.Undo();
+                    await swapCommand.ExecuteAync(undo: true);
                 }
 
 
@@ -180,6 +180,11 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 _seletedSeal = null;
             }
             
+
+        }
+
+        private async Task ProcessMatch()
+        {
 
         }
 

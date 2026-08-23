@@ -15,6 +15,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
     {
         Swap,
         Fall,
-        Explosion,
+        Explosion
     }
 }

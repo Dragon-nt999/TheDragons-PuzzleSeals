@@ -25,7 +25,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 if(currentSeal != null)
                 {
                     var type = currentSeal.Model.Type;
-                    matches[type] = new HashSet<SealModel>();
+                    matches[type] = [];
 
                     for (int x = 0; x < ctx.Width - 2; x++)
                     {
@@ -36,9 +36,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         {
                             if (IsSametype(s1, s2, type) && IsSametype(s2, s3, type))
                             {
-                                matches[type].Add(s1);
-                                matches[type].Add(s2);
-                                matches[type].Add(s3);
+                               matches[type].Add(s1);
+                               matches[type].Add(s2);
+                               matches[type].Add(s3);
                             }
                         }
                     }
@@ -59,16 +59,25 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         }
                     }
 
-                    if (matches[type].Count == 0)
-                    {
-                        matches.Clear();
-                    }
-
                     currentSeal = null;
                 }
             }
 
             return matches;
+        }
+
+        public static bool HasMatches(Dictionary<SealType, HashSet<SealModel>> matches)
+        {
+            if (matches == null) return false;
+            foreach(var match in matches)
+            {
+                if(match.Value != null && match.Value.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool IsSametype(SealModel s1, SealModel s2, SealType matchType)
