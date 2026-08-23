@@ -6,33 +6,43 @@ using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
-    public class SwapCommand(MapContextModel ctx)
+    public class SwapCommand(MapContextModel ctx, Vector2I from, Vector2I to)
     {
         private readonly MapContextModel _ctx = ctx;
-        private Vector2I oldCurrent;
-        private Vector2I oldTarget;
+        private readonly Vector2I _from = from;
+        private readonly Vector2I _to = to;
 
-        public async Task ExecuteAync()
+        public async Task ExecuteAync(bool undo = false)
         {
-            if(_ctx.SwapData.Count == 2)
+            if(undo == false)
             {
-                Vector2I current = _ctx.SwapData["current"];
-                Vector2I target = _ctx.SwapData["target"];
-
-                oldCurrent = current;
-                oldTarget = target;
-
-                Seal seal1 = _ctx.SealViews[current];
-                Seal seal2 = _ctx.SealViews[target];
-                Vector2 target1 = _ctx.ConvertPosition(current.X, current.Y);
-                Vector2 target2 = _ctx.ConvertPosition(target.X, target.Y);
-
-                await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
-
-                SwapSeal(current, target);
-
-                _ctx.SwapData.Clear();
+                await PlaySwap(_from, _to);
+            } else
+            {
+                await PlaySwap(_to, _from);
             }
+        }
+
+        private async Task PlaySwap(Vector2I from, Vector2I to, bool undo = false)
+        {
+            Seal seal1 = _ctx.SealViews[from];
+            Seal seal2 = _ctx.SealViews[to];
+            Vector2 target1 = _ctx.ConvertPosition(from.X, from.Y);
+            Vector2 target2 = _ctx.ConvertPosition(to.X, to.Y);
+
+            if(undo == false)
+            {
+                seal1.Model.Action = SealAction.Swap;
+                seal2.Model.Action = SealAction.Swap;
+            } else
+            {
+                seal1.Model.Action = null;
+                seal2.Model.Action = null;
+            }
+            
+            await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
+
+            SwapSeal(from, to);
         }
 
         private void SwapSeal(Vector2I current, Vector2I target)

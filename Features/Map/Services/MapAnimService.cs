@@ -21,8 +21,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private static async Task WaitAll(List<Tween> tweens)
         {
             var tasks = tweens.Where(t => t != null && t.IsValid())
-                              .Select(async t => t.ToSignal(t, Tween.SignalName.Finished));
-            await Task.WhenAll(tasks);
+                              .Select(async t => await t.ToSignal(t, Tween.SignalName.Finished));
+
+            if(tasks.Any()) await Task.WhenAll(tasks);
         }
 
         private static Tween MoveTo(Seal seal, Vector2 newPos, double duration = 0.3)
