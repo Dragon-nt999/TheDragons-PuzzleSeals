@@ -56,8 +56,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 if (mouseButton.Pressed)
                 {
                     EmitSignal(SignalName.SealTouched, this, mouseButton.Position);
-
-                   // GD.Print($"Seal Selected: {Model.X} === {Model.Y}");
                 }
             }
         }
