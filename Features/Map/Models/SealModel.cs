@@ -3,18 +3,11 @@ using System;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
-    public class SealModel
+    public class SealModel(int x, int y, SealType type)
     {
-        public int X;
-        public int Y;
-        public SealType Type;
-
-        public SealModel(int x, int y, SealType type)
-        {
-            X    = x;
-            Y    = y;
-            Type = type;
-        }
+        public int X { get; set; } = x;
+        public int Y { get; set; } = y;
+        public SealType Type { get; } = type;
     }
 
 }

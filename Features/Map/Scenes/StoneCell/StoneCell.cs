@@ -13,10 +13,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
             _sprite = GetNode<Sprite2D>("Object");
         }
 
-        public void Initialize(SealModel model, float size)
+        public void Initialize(Vector2I posCell, float size)
         {
-            if (model == null) return;
-
             Vector2 textureSize = _sprite.Texture.GetSize();
             Vector2 scale = new Vector2(size / textureSize.X, size / textureSize.Y);
             _sprite.Scale = scale;
@@ -26,7 +24,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             string texturePath = $"res://Assets/Textures/StoneCell/cell_green_{shape}.png";
 
-            if((model.Y % 2 == 0 && model.X % 2 == 0) || (model.Y % 2 != 0 && model.X % 2 != 0))
+            if((posCell.Y % 2 == 0 && posCell.X % 2 == 0) || (posCell.Y % 2 != 0 && posCell.X % 2 != 0))
             {
                 texturePath = $"res://Assets/Textures/StoneCell/cell_gray_{shape}.png";
             }

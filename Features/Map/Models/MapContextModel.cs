@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -9,12 +10,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public PackedScene SealScene { get; init; }
         public PackedScene StoneCellScene { get; init; }
         public PackedScene FrameCellScene { get; init; }
-        public SealModel[,] MapData { get; init; }
-        public Seal[,] SealData { get; set; }
+        public MapObjectModel[,] MapData { get; init; }
         public float SealSize { get; init; }
         public int Width { get; init; }
         public int Height { get; init; }
         public Func<int, int, Vector2> ConvertPosition { get; init; }
+
+        public Dictionary<Vector2I, Seal> SealViews = [];
+
+        public Dictionary<string, Vector2I> SwapData = [];
     }
 
 }

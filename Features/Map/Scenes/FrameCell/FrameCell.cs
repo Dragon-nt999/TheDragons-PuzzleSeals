@@ -34,68 +34,66 @@ namespace TheDragonsPuzzleSeals.Features.Map
             }
         }
 
-        public FrameSealModel SetUp(SealModel model, Vector2 pos, 
+        public FrameSealModel SetUp(Vector2I posCell, Vector2 pos, 
                                     float sealSize, int width, 
                                     int height)
         {
-            if (model == null) return null;
-
             Vector2 textureSize = _sprite.Texture.GetSize();
 
             int newSize = Convert.ToInt32(Math.Round(sealSize + (sealSize * distanceScale)));
 
-            Vector2 scale = new Vector2(newSize / textureSize.X, newSize / textureSize.Y);
+            Vector2 scale = new(newSize / textureSize.X, newSize / textureSize.Y);
             _sprite.Scale = scale;
 
             string type = "center";
 
-            Vector2 topleft  = new Vector2(distancePos, distancePos);
-            Vector2 botleft  = new Vector2(distancePos, -distancePos);
-            Vector2 topright = new Vector2(-distancePos, distancePos);
-            Vector2 botright = new Vector2(-distancePos, -distancePos);
-            Vector2 top      = new Vector2(0, distancePos);
-            Vector2 left     = new Vector2(distancePos, 0);
-            Vector2 bot      = new Vector2(0, -distancePos);
-            Vector2 right    = new Vector2(-distancePos, 0);
+            Vector2 topleft  = new(distancePos, distancePos);
+            Vector2 botleft  = new(distancePos, -distancePos);
+            Vector2 topright = new(-distancePos, distancePos);
+            Vector2 botright = new(-distancePos, -distancePos);
+            Vector2 top      = new(0, distancePos);
+            Vector2 left     = new(distancePos, 0);
+            Vector2 bot      = new(0, -distancePos);
+            Vector2 right    = new(-distancePos, 0);
 
             int index = _frameIndex[_rand.Next(_frameIndex.Length)];
 
-            if (model.X == 0 && model.Y == 0)
+            if (posCell.X == 0 && posCell.Y == 0)
             {
                 type = "topleft";
                 pos -= topleft;
             }
-            else if ((model.X > 0 && model.X < width - 1) && model.Y == 0)
+            else if ((posCell.X > 0 && posCell.X < width - 1) && posCell.Y == 0)
             {
                 type = "top_" + index;
                 pos -= top;
             }
-            else if (model.X == 0 && (model.Y > 0 && model.Y < height - 1))
+            else if (posCell.X == 0 && (posCell.Y > 0 && posCell.Y < height - 1))
             {
                 type = "left_" + index;
                 pos -= left;
             }
-            else if (model.X == 0 && model.Y == height - 1)
+            else if (posCell.X == 0 && posCell.Y == height - 1)
             {
                 type = "botleft";
                 pos -= botleft;
             }
-            else if ((model.X > 0 && model.X < width - 1) && model.Y == height - 1)
+            else if ((posCell.X > 0 && posCell.X < width - 1) && posCell.Y == height - 1)
             {
                 type = "bot_" + index;
                 pos -= bot;
             }
-            else if (model.X == width - 1 && model.Y == 0)
+            else if (posCell.X == width - 1 && posCell.Y == 0)
             {
                 type = "topright";
                 pos -= topright;
             }
-            else if (model.X == width - 1 && model.Y == height - 1)
+            else if (posCell.X == width - 1 && posCell.Y == height - 1)
             {
                 type = "botright";
                 pos -= botright;
             }
-            else if (model.X == width - 1 && (model.Y > 0 && model.Y < height - 1))
+            else if (posCell.X == width - 1 && (posCell.Y > 0 && posCell.Y < height - 1))
             {
                 type = "right_" + index;
                 pos -= right;
@@ -103,7 +101,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             string texturePath = $"res://Assets/Textures/FrameCell/{type}.png";
 
-            Config = new FrameSealModel(texturePath, pos);
+            Config = new(texturePath, pos);
 
             return Config;
         }
