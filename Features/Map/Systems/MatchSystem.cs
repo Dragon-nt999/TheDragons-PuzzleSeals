@@ -1,8 +1,5 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -15,9 +12,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             Seal currentSeal = null;
 
-            foreach(var seal in ctx.SealViews.Values)
+            foreach (var seal in ctx.SealViews.Values)
             {
-                if (seal != null && seal.Model.Action == SealAction.Swap)
+                if (seal != null && (seal.Model.Action == SealAction.Swap
+                                            || seal.Model.Action == SealAction.Fall))
                 {
                     currentSeal = seal;
                 }
@@ -33,7 +31,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         var s2 = ctx.SealViews[new Vector2I(x + 1, currentSeal.Model.Y)];
                         var s3 = ctx.SealViews[new Vector2I(x + 2, currentSeal.Model.Y)];
 
-                        tempMatches.UnionWith(addMatches(s1, s2, s3, type));
+                        tempMatches.UnionWith(AddMatches(s1, s2, s3, type));
                     }
 
                     for(int y = 0; y < ctx.Height - 2; y++)
@@ -42,7 +40,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         var s2 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 1)];
                         var s3 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 2)];
 
-                        tempMatches.UnionWith(addMatches(s1, s2, s3, type));
+                        tempMatches.UnionWith(AddMatches(s1, s2, s3, type));
 
                     }
 
@@ -58,7 +56,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             return matches;
         }
 
-        private static HashSet<SealModel> addMatches(Seal s1, Seal s2, Seal s3, SealType type)
+        private static HashSet<SealModel> AddMatches(Seal s1, Seal s2, Seal s3, SealType type)
         {
             HashSet<SealModel> tempMatches = [];
             if (s1 != null && s2 != null && s3 != null)

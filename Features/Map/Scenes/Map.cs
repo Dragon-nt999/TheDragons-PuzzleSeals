@@ -73,9 +73,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 FrameCellScene  = FrameCellScene,
                 MapData         = _mapData,
                 SealSize        = _sealSize,
+                OffsetX         = _offsetX,
+                OffsetY         = _offsetY,
                 Width           = _width,
-                Height          = _height,
-                ConvertPosition = ConvertPostion
+                Height          = _height
             };
 
             // Render
@@ -86,20 +87,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 _renderService.SealTouched += OnSealTouched;
             }
 
-        }
-
-        /// <summary>
-        /// Calculate position Seal or somethings else from SealMode[X, Y]
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        private Vector2 ConvertPostion(int x, int y)
-        {
-            float xPos = x * _sealSize + _offsetX + (_sealSize / 2);
-            float yPos = y * _sealSize + _offsetY + (_sealSize / 2);
-
-            return new Vector2(xPos, yPos);
         }
 
         /// <summary>
@@ -174,7 +161,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     await swapCommand.Undo();
                 }
 
-
                 // Reset Swap
                 _seletedSeal = null;
             }
@@ -198,10 +184,16 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
                     DestroyCommand destroyCommand = new(_ctx, matches);
                     await destroyCommand.ExecuteAync();
+
+                    CascadeCommand cascadeCommand = new(_ctx, matches);
+                    await cascadeCommand.ExecuteAync();
+
                     initMatches.Remove(key);
+
+                    initMatches = MatchSystem.findMatch(_ctx);
                 }
 
-                //initMatches = MatchSystem.findMatch(_ctx);
+                
             }
         }
 

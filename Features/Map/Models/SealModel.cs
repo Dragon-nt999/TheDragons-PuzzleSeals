@@ -1,6 +1,3 @@
-using Godot;
-using System;
-
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class SealModel(int x, int y, SealType type)

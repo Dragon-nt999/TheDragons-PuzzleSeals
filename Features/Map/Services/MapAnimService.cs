@@ -39,5 +39,19 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             return tween;
         }
+
+        public static async Task PlayCascade(List<MoveModel> moves)
+        {
+            if(moves.Count > 0)
+            {
+                List<Tween> tweens = [];
+                foreach(var move in moves)
+                {
+                    tweens.Add(MoveTo(move.Seal, move.To));
+                }
+
+                await WaitAll(tweens);
+            }
+        }
     }
 }

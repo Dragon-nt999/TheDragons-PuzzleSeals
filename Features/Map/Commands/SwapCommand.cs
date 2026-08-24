@@ -41,29 +41,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             
             await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
 
-            SwapSeal(from, to);
-        }
-
-        private void SwapSeal(Vector2I current, Vector2I target)
-        {
-
-            // Update seal' model
-            if (GodotObject.IsInstanceValid(_ctx.SealViews[current]))
-            {
-                _ctx.SealViews[current].Model.X = target.X;
-                _ctx.SealViews[current].Model.Y = target.Y;
-            }
-
-            if (GodotObject.IsInstanceValid(_ctx.SealViews[target]))
-            {
-                _ctx.SealViews[target].Model.X = current.X;
-                _ctx.SealViews[target].Model.Y = current.Y;
-            }
-
-
-            (_ctx.SealViews[current], _ctx.SealViews[target]) =
-                    (_ctx.SealViews[target], _ctx.SealViews[current]);
-
+            _ctx.SwapData(from, to);
         }
     }
 }
