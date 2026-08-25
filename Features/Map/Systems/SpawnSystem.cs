@@ -33,6 +33,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                                                    == type && seals[new Vector2I(obj.X, obj.Y - 2)].Type == type));
 
                 seals[new Vector2I(obj.X, obj.Y)] = new SealModel(obj.X, obj.Y, type);
+                obj.Type = ObjectType.Seal;
             }
 
             return seals;

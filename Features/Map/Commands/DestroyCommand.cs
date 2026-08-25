@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class DestroyCommand(MapContextModel ctx, HashSet<SealModel> matches) : ICommand

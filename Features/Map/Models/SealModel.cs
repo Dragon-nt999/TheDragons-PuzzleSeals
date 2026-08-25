@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -9,6 +8,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public int Y { get; set; } = y;
         public SealType Type { get; } = type;
         public SealAction? Action { get; set; } = null;
+        public Vector2? MoveTo { get; set; } = null;
     }
 
 }

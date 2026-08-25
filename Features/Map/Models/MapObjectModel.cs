@@ -1,5 +1,3 @@
-
-
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class MapObjectModel(int x, int y,

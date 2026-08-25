@@ -22,48 +22,19 @@ namespace TheDragonsPuzzleSeals.Features.Map
             await PlaySwap(_to, _from);
         }
 
-        private async Task PlaySwap(Vector2I from, Vector2I to, bool undo = false)
+        private async Task PlaySwap(Vector2I from, Vector2I to)
         {
             Seal seal1 = _ctx.SealViews[from];
             Seal seal2 = _ctx.SealViews[to];
             Vector2 target1 = _ctx.ConvertPosition(from.X, from.Y);
             Vector2 target2 = _ctx.ConvertPosition(to.X, to.Y);
 
-            if(undo == false)
-            {
-                seal1.Model.Action = SealAction.Swap;
-                seal2.Model.Action = SealAction.Swap;
-            } else
-            {
-                seal1.Model.Action = null;
-                seal2.Model.Action = null;
-            }
+            seal1.Model.Action = SealAction.Swap;
+            seal2.Model.Action = SealAction.Swap;
             
             await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
 
-            SwapSeal(from, to);
-        }
-
-        private void SwapSeal(Vector2I current, Vector2I target)
-        {
-
-            // Update seal' model
-            if (GodotObject.IsInstanceValid(_ctx.SealViews[current]))
-            {
-                _ctx.SealViews[current].Model.X = target.X;
-                _ctx.SealViews[current].Model.Y = target.Y;
-            }
-
-            if (GodotObject.IsInstanceValid(_ctx.SealViews[target]))
-            {
-                _ctx.SealViews[target].Model.X = current.X;
-                _ctx.SealViews[target].Model.Y = current.Y;
-            }
-
-
-            (_ctx.SealViews[current], _ctx.SealViews[target]) =
-                    (_ctx.SealViews[target], _ctx.SealViews[current]);
-
+            _ctx.SwapData(from, to);
         }
     }
 }
