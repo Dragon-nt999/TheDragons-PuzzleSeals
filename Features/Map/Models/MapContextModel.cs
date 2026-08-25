@@ -54,6 +54,17 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     (SealViews[target], SealViews[current]);
 
         }
+
+        public void ResetDataAllSeals()
+        {
+            foreach(var seal in SealViews)
+            {
+                if(seal.Value != null && seal.Value.Model.Action != null)
+                {
+                    seal.Value.Reset();
+                }
+            }
+        }
     }
 
 }

@@ -22,22 +22,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
             await PlaySwap(_to, _from);
         }
 
-        private async Task PlaySwap(Vector2I from, Vector2I to, bool undo = false)
+        private async Task PlaySwap(Vector2I from, Vector2I to)
         {
             Seal seal1 = _ctx.SealViews[from];
             Seal seal2 = _ctx.SealViews[to];
             Vector2 target1 = _ctx.ConvertPosition(from.X, from.Y);
             Vector2 target2 = _ctx.ConvertPosition(to.X, to.Y);
 
-            if(undo == false)
-            {
-                seal1.Model.Action = SealAction.Swap;
-                seal2.Model.Action = SealAction.Swap;
-            } else
-            {
-                seal1.Model.Action = null;
-                seal2.Model.Action = null;
-            }
+            seal1.Model.Action = SealAction.Swap;
+            seal2.Model.Action = SealAction.Swap;
             
             await MapAnimService.PlaySwap(seal1, seal2, target1, target2);
 

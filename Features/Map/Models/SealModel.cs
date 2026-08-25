@@ -1,3 +1,5 @@
+using Godot;
+
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class SealModel(int x, int y, SealType type)
@@ -6,6 +8,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public int Y { get; set; } = y;
         public SealType Type { get; } = type;
         public SealAction? Action { get; set; } = null;
+        public Vector2? MoveTo { get; set; } = null;
     }
 
 }

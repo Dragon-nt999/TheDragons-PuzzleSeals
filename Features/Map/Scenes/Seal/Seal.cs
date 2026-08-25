@@ -60,6 +60,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
             }
         }
 
+        public void Reset()
+        {
+            Model.Action = null;
+            Model.MoveTo = null;
+        }
+
         public override void _ExitTree()
         {
             InputEvent -= OnTouchedEvent;

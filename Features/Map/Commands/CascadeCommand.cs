@@ -1,50 +1,73 @@
 using Godot;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
-    public class CascadeCommand(MapContextModel ctx, HashSet<SealModel> matches) : ICommand
+    public class CascadeCommand(MapContextModel ctx) : ICommand
     {
         private readonly MapContextModel _ctx = ctx;
-        private readonly HashSet<SealModel> _matches = matches;
         public async Task ExecuteAync()
         {
-            List<MoveModel> moves = CalculateCascade();
+            List<Seal> moves = CalculateCascade();
             if(moves.Count > 0)
             {
-                await MapAnimService.PlayCascade(moves);
+               await MapAnimService.PlayCascade(moves);
             }
         }
 
-        private List<MoveModel> CalculateCascade()
+        private List<Seal> CalculateCascade()
         {
-            List<MoveModel> moves = [];
+            List<Seal> moves = [];
 
-            foreach(var model in _matches)
+            var cellsEmpty = FindAndSortCellEmpty();
+
+            foreach (var model in cellsEmpty)
             {
-                for(int y = model.Y; y > 0; y--)
+                int toIndex = model.Y;
+
+                for(int fromIndex = model.Y; fromIndex >= 0; fromIndex--)
                 {
-                    var x = model.X;
-                    var fromIndex = new Vector2I(x, y - 1);
-                    var toIndex = new Vector2I(x, y);
-                    if (GodotObject.IsInstanceValid(_ctx.SealViews[fromIndex]))
+                    var from = new Vector2I(model.X, fromIndex);
+
+                    if(GodotObject.IsInstanceValid(_ctx.SealViews[from]))
                     {
-                        Vector2 from = _ctx.ConvertPosition(fromIndex.X, fromIndex.Y);
-                        Vector2 to   = _ctx.ConvertPosition(toIndex.X, toIndex.Y);
-                        Seal seal    = _ctx.SealViews[fromIndex];
+                        var to = new Vector2I(model.X, toIndex);
+
+                        Seal seal = _ctx.SealViews[from];
                         seal.Model.Action = SealAction.Fall;
+                        seal.Model.MoveTo = _ctx.ConvertPosition(to.X, to.Y);
 
-                        MoveModel cascadeSeal = new(from, to, seal);
-                        moves.Add(cascadeSeal);
+                        moves.Add(seal);
 
-                        _ctx.SwapData(fromIndex, toIndex);
+                        _ctx.SwapData(from, to);
+
+                        toIndex--;
                     }
                 }
             }
 
             return moves;
+        }
+
+        private List<MapObjectModel> FindAndSortCellEmpty()
+        {
+            List<MapObjectModel> data = [];
+
+            foreach(var cell in _ctx.MapData)
+            {
+                if(cell.Type == null)
+                {
+                    data.Add(cell);
+                }
+            }
+
+            List<MapObjectModel> distinct = [.. data.OrderByDescending(arr => arr.Y)
+                .GroupBy(arr => arr.X)
+                .Select(g => g.First())];
+
+            return distinct;
         }
     }
 

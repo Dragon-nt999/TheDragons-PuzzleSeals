@@ -163,37 +163,23 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
                 // Reset Swap
                 _seletedSeal = null;
+
+                // Reset Seal views
+                _ctx.ResetDataAllSeals();
             }
             
 
         }
 
-        private async Task ProcessMatch(Dictionary<SealType, HashSet<SealModel>> originalMatches)
+        private async Task ProcessMatch(Dictionary<SealType, HashSet<SealModel>> matches)
         {
-            Dictionary<SealType, HashSet<SealModel>> initMatches = originalMatches;
-            while(initMatches.Count > 0)
+            while(matches.Count > 0)
             {
-                foreach(var (key, matches) in initMatches)
-                {
-                   /* if(matches != null && matches.Count == 3)
-                    {
-                        DestroyCommand destroyCommand = new(_ctx, matches);
-                        await destroyCommand.ExecuteAync();
-                        initMatches.Remove(key);
-                    } */
+                await new ResolveMatchCommand(_ctx, matches).ExecuteAync();
 
-                    DestroyCommand destroyCommand = new(_ctx, matches);
-                    await destroyCommand.ExecuteAync();
+                await new CascadeCommand(_ctx).ExecuteAync();
 
-                    CascadeCommand cascadeCommand = new(_ctx, matches);
-                    await cascadeCommand.ExecuteAync();
-
-                    initMatches.Remove(key);
-
-                    initMatches = MatchSystem.findMatch(_ctx);
-                }
-
-                
+                matches = MatchSystem.findMatch(_ctx);
             }
         }
 
@@ -210,6 +196,21 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     _mapData[x, y] = new MapObjectModel(x, y);
                 }
             }
+        }
+
+        private void ClearMap()
+        {
+            if(_mapData != null && _mapData.Length > 0)
+            {
+                for (var x = 0; x < _width; x++)
+                {
+                    for (var y = 0; y < _height; y++)
+                    {
+                        _mapData[x, y] = null;
+                    }
+                }
+            }
+            
         }
 
         public override void _ExitTree()
