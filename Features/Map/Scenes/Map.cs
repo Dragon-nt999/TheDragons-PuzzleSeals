@@ -148,7 +148,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
                 // Reset Swap
                 _seletedSeal = null;
-
             }
         }
 

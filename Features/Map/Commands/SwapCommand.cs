@@ -24,7 +24,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             await PlaySwap(_dataSwap["SwapTo"], _dataSwap["SwapFrom"]);
         }
 
-        public async Task PlaySwap(Vector2I target1, Vector2I target2, bool undo = false)
+        public async Task PlaySwap(Vector2I target1, Vector2I target2)
         {
             Seal seal1 = _ctx.SealViews[target1];
             Seal seal2 = _ctx.SealViews[target2];
@@ -33,17 +33,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             seal2.Model.MoveTo = _ctx.ConvertPosition(target1.X, target1.Y);
 
             await MapAnimService.PlaySwap(seal1, seal2);
-
-            if(undo == false)
-            {
-                seal1.Model.Action = SealAction.Swap;
-                seal2.Model.Action = SealAction.Swap;
-            } else
-            {
-                seal1.Model.Action = null;
-                seal2.Model.Action = null;
-            }
-
+            
             SwapSystem.SwapData(_ctx.SealViews, target1, target2);
         }
     }
