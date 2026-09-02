@@ -5,22 +5,44 @@ using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
-    public class ResolveMatchCommand(MapContextModel ctx, Dictionary<SealType, HashSet<SealModel>> matches) : ICommand
+    public class ResolveMatchCommand(MapContextModel ctx, 
+                                     List<HashSet<Seal>> matches) : ICommand
     {
         private readonly MapContextModel _ctx = ctx;
-        private Dictionary<SealType, HashSet<SealModel>> _initialMatches = matches;
+        private List<HashSet<Seal>> _initialMatches = [.. matches];
+
+        private CascadeSystem _cascadeSystem;
+        private DestroySystem _destroySystem;
         public async Task ExecuteAync()
         {
-            foreach (var (key, matches) in _initialMatches)
+            _destroySystem = new DestroySystem(_ctx);
+            while (_initialMatches.Count > 0)
             {
-                if (matches != null)
-                {
-                    DestroyCommand destroyCommand = new(_ctx, matches);
-                    await destroyCommand.ExecuteAync();
+                await ProcessMatch();
+                _initialMatches = MatchSystem.FindMatch(_ctx);
+            }    
+        }
 
-                    _initialMatches.Remove(key);
+        private async Task ProcessMatch()
+        {
+            for (var i = _initialMatches.Count - 1; i >= 0; i--)
+            {
+                var match = _initialMatches[i];
+                if (match != null)
+                {
+                    // Destroy seals
+                    // and collect cell null on map
+                    await _destroySystem.Execute(match);
+
+                    _initialMatches.RemoveAt(i);
+
+                    // Refill seals
                 }
             }
+
+            // Play cascade
+            _cascadeSystem = new CascadeSystem(_ctx, _destroySystem.CellNull);
+            await _cascadeSystem.PlayCascadeAsync();
         }
     }
 }

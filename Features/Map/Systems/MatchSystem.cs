@@ -5,86 +5,98 @@ namespace TheDragonsPuzzleSeals.Features.Map
 {
     public static class MatchSystem
     {
-        public static Dictionary<SealType, HashSet<SealModel>> findMatch(MapContextModel ctx)
+        public static List<HashSet<Seal>> FindMatch(MapContextModel ctx)
         {
-            if (ctx.SealViews == null || ctx.SealViews.Count <= 0) return null;
-            Dictionary<SealType, HashSet<SealModel>> matches = [];
+            if (ctx.SealViews == null || ctx.SealViews.Count == 0) return null;
+            List<HashSet<Seal>> finalMatches = [];
+            List<HashSet<Seal>> rawMatches   = FindAllMap(ctx);
 
-            Seal currentSeal = null;
+            if(rawMatches.Count == 0) return finalMatches;
 
-            foreach (var seal in ctx.SealViews.Values)
+            foreach(var group in rawMatches)
             {
-                if (seal != null && (seal.Model.Action == SealAction.Swap
-                                            || seal.Model.Action == SealAction.Fall))
+                var mergeGroup = new HashSet<Seal>(group);
+                for(int i = finalMatches.Count - 1; i >= 0; i--)
                 {
-                    currentSeal = seal;
+                    if(mergeGroup.Overlaps(finalMatches[i]))
+                    {
+                        mergeGroup.UnionWith(finalMatches[i]);
+                        finalMatches.RemoveAt(i);
+                    }
                 }
 
-                if(currentSeal != null)
+                finalMatches.Add(mergeGroup);
+            }
+            
+            return finalMatches;
+        }
+
+        private static List<HashSet<Seal>> FindAllMap(MapContextModel ctx)
+        {
+            List<HashSet<Seal>> results = [];
+            HashSet<Seal> temps = [];
+
+            //  Find by Horizonal
+            for(int y = 0; y < ctx.Height; y++)
+            {
+                for(int x = 0; x < ctx.Width - 2; x++)
                 {
-                    var type = currentSeal.Model.Type;
-                    HashSet<SealModel> tempMatches = [];
+                    Seal s1 = ctx.SealViews[new Vector2I(x, y)];
+                    Seal s2 = ctx.SealViews[new Vector2I(x + 1, y)];
+                    Seal s3 = ctx.SealViews[new Vector2I(x + 2, y)];
 
-                    for (int x = 0; x < ctx.Width - 2; x++)
+                    if(s1 == null || s2 == null || s3 == null) continue;
+
+                    if(IsSametype(s1.Model, s2.Model) && IsSametype(s2.Model, s3.Model))
                     {
-                        var s1 = ctx.SealViews[new Vector2I(x, currentSeal.Model.Y)];
-                        var s2 = ctx.SealViews[new Vector2I(x + 1, currentSeal.Model.Y)];
-                        var s3 = ctx.SealViews[new Vector2I(x + 2, currentSeal.Model.Y)];
-
-                        tempMatches.UnionWith(AddMatches(s1, s2, s3, type));
+                        temps.Add(s1);
+                        temps.Add(s2);
+                        temps.Add(s3);
                     }
+                }
 
-                    for(int y = 0; y < ctx.Height - 2; y++)
-                    {
-                        var s1 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y)];
-                        var s2 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 1)];
-                        var s3 = ctx.SealViews[new Vector2I(currentSeal.Model.X, y + 2)];
-
-                        tempMatches.UnionWith(AddMatches(s1, s2, s3, type));
-
-                    }
-
-                    if(tempMatches.Count >= 3)
-                    {
-                        matches[type] = tempMatches;
-                    }
-
-                    currentSeal = null;
+                if(temps.Count > 2)
+                {
+                    results.Add(temps);
+                    temps = [];
                 }
             }
 
-            return matches;
-        }
-
-        private static HashSet<SealModel> AddMatches(Seal s1, Seal s2, Seal s3, SealType type)
-        {
-            HashSet<SealModel> tempMatches = [];
-            if (s1 != null && s2 != null && s3 != null)
+            //  Find by Vertical
+            for(int x = 0; x < ctx.Width; x++)
             {
-                var m1 = s1.Model;
-                var m2 = s2.Model;
-                var m3 = s3.Model;
-
-                if (m1 != null && m2 != null && m3 != null)
+                for(int y = 0; y < ctx.Height - 2; y++)
                 {
-                    if (IsSametype(m1, m2, type) && IsSametype(m2, m3, type))
+                    Seal s1 = ctx.SealViews[new Vector2I(x, y)];
+                    Seal s2 = ctx.SealViews[new Vector2I(x, y + 1)];
+                    Seal s3 = ctx.SealViews[new Vector2I(x, y + 2)];
+
+                    if(s1 == null || s2 == null || s3 == null) continue;
+
+                    if(IsSametype(s1.Model, s2.Model) && IsSametype(s2.Model, s3.Model))
                     {
-                        tempMatches.Add(m1);
-                        tempMatches.Add(m2);
-                        tempMatches.Add(m3);
+                        temps.Add(s1);
+                        temps.Add(s2);
+                        temps.Add(s3);
                     }
+                }
+
+                if(temps.Count > 2)
+                {
+                    results.Add(temps);
+                    temps = [];
                 }
             }
 
-            return tempMatches;
-        }
+            return results;
+        } 
 
-        public static bool HasMatches(Dictionary<SealType, HashSet<SealModel>> matches)
+        public static bool HasMatches(List<HashSet<Seal>> matches)
         {
             if (matches == null) return false;
             foreach(var match in matches)
             {
-                if(match.Value != null && match.Value.Count > 0)
+                if(match != null && match.Count > 0)
                 {
                     return true;
                 }
@@ -93,9 +105,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
             return false;
         }
 
-        private static bool IsSametype(SealModel s1, SealModel s2, SealType matchType)
+        private static bool IsSametype(SealModel s1, SealModel s2)
         {
-            return (s1.Type == s2.Type) && (s2.Type == matchType);
+            return s1.Type == s2.Type;
         }
     }
 }
