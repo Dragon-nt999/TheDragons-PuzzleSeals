@@ -10,7 +10,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         {
             Dictionary<Vector2I, SealModel> seals = [];
             Random rand          = new Random();
-            SealType[] poolType  = new SealType[]
+            SealType[] poolType  =
             {
                 SealType.red,
                 SealType.blue,

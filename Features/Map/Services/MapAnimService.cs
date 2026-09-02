@@ -8,12 +8,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class MapAnimService()
     {
-        public static async Task PlaySwap(Seal s1, Seal s2, Vector2 target1, Vector2 target2)
+        public static async Task PlaySwap(Seal s1, Seal s2)
         {
             List<Tween> tweens = [];
 
-            tweens.Add(MoveTo(s1, target2));
-            tweens.Add(MoveTo(s2, target1));
+            tweens.Add(MoveTo(s1));
+            tweens.Add(MoveTo(s2));
 
             await WaitAll(tweens);
         }
@@ -26,18 +26,29 @@ namespace TheDragonsPuzzleSeals.Features.Map
             if(tasks.Any()) await Task.WhenAll(tasks);
         }
 
-        private static Tween MoveTo(Seal seal, Vector2 newPos, double delay = 0, double duration = 0.3)
+        private static Tween MoveTo(Seal seal, 
+                                    double delay = 0, 
+                                    double duration = 0.3,
+                                    Animtype type = Animtype.Move)
         {
             if (!GodotObject.IsInstanceValid(seal)) return null;
-            Tween tween = seal.CreateTween();
 
-            if (tween == null) return null;
+            var movePos = seal.Model.MoveTo.Value;
+            Tween tween = seal.CreateTween();
 
             if (delay > 0) tween.TweenInterval(delay);
 
-            tween.TweenProperty(seal, "position", newPos, duration)
-                                .SetTrans(Tween.TransitionType.Back)
-                                .SetEase(Tween.EaseType.Out);
+            if(type == Animtype.Fall)
+            {
+                tween.SetTrans(Tween.TransitionType.Bounce); 
+                tween.SetEase(Tween.EaseType.Out);
+            } else
+            {
+                tween.SetTrans(Tween.TransitionType.Back); 
+                tween.SetEase(Tween.EaseType.Out);
+            }
+
+            tween.TweenProperty(seal, "position", movePos, duration);
 
             return tween;
         }
@@ -56,15 +67,13 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     }
 
                     float distance = Mathf.Abs(seal.Model.MoveTo.Value.Y - seal.Position.Y);
-                    float gravityFactor = 0.02f;
-                    float duration = distance * gravityFactor;
-                    duration = Mathf.Clamp(duration, 0.15f, 0.6f);
+                    float gravityFactor = 0.08f;
+                    float duration = distance * gravityFactor * gravityFactor;
+                    duration = Mathf.Clamp(duration, 0.0f, 1.0f);
 
-                    float baseDelay = distance / 1000.0f;
-                    float randomOffset = (float)GD.RandRange(-0.05, 0.05);
-                    float delay = Mathf.Clamp(baseDelay + randomOffset, 0.0f, 0.4f);
+                    float delay = (float)GD.RandRange(0.01, 0.1);
 
-                    tweens.Add(MoveTo(seal, seal.Model.MoveTo.Value, delay, duration));
+                    tweens.Add(MoveTo(seal, delay, duration, Animtype.Fall));
                 }
 
                 await WaitAll(tweens);
