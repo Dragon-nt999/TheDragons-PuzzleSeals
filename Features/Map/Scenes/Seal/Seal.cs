@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 namespace TheDragonsPuzzleSeals.Features.Map
 {
+    [DebuggerDisplay("Type: {Model.Type} | Index: {Model.X}, {Model.Y}")]
     public partial class Seal : Area2D
     {
         [Signal]

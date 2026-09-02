@@ -129,33 +129,18 @@ namespace TheDragonsPuzzleSeals.Features.Map
             if ((_seletedSeal.Model.X >= 0 && _seletedSeal.Model.X < _width)
                     && (_seletedSeal.Model.Y >= 0 && _seletedSeal.Model.Y < _height))
             {
-                int currentX = _seletedSeal.Model.X;
-                int currentY = _seletedSeal.Model.Y;
-                int targetX = currentX;
-                int targetY = currentY;
 
-                if (MathF.Abs(distance.X) > MathF.Abs(distance.Y))
-                {
-                    targetX += distance.X > 0 ? 1 : -1;
-                }
-                else
-                {
-                    targetY += distance.Y > 0 ? 1 : -1;
-                }
-
-                var swapFrom = new Vector2I(currentX, currentY);
-                var swapTo = new Vector2I(targetX, targetY);
-
-                SwapCommand swapCommand = new (_ctx, swapFrom, swapTo);
+                // Swap seals
+                SwapCommand swapCommand = new(_ctx, _seletedSeal, distance);
                 await swapCommand.ExecuteAync();
 
                 // Finding matches
-                Dictionary<SealType, HashSet<SealModel>> matches = MatchSystem.findMatch(_ctx);
+                List<HashSet<Seal>> matches = MatchSystem.FindMatch(_ctx);
 
                 // Processing matches
                 if(MatchSystem.HasMatches(matches))
                 {
-                    await ProcessMatch(matches);
+                    await new ResolveMatchCommand(_ctx, matches).ExecuteAync();
                 } else
                 {
                     await swapCommand.Undo();
@@ -164,22 +149,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 // Reset Swap
                 _seletedSeal = null;
 
-                // Reset Seal views
-                _ctx.ResetDataAllSeals();
-            }
-            
-
-        }
-
-        private async Task ProcessMatch(Dictionary<SealType, HashSet<SealModel>> matches)
-        {
-            while(matches.Count > 0)
-            {
-                await new ResolveMatchCommand(_ctx, matches).ExecuteAync();
-
-                await new CascadeCommand(_ctx).ExecuteAync();
-
-                matches = MatchSystem.findMatch(_ctx);
             }
         }
 
