@@ -87,6 +87,37 @@ namespace TheDragonsPuzzleSeals.Features.Map
         }
 
         /// <summary>
+        /// Render Seals for Refill System
+        /// </summary>
+        public List<Seal> ReSpawnSeals(Dictionary<Vector2I, SealModel> sealData)
+        {
+            List<Seal> newSeals = [];
+
+            if(sealData == null || sealData.Count == 0) return newSeals;
+
+            foreach(var (index, model) in sealData)
+            {
+                Seal seal = _ctx.SealScene.Instantiate<Seal>();
+                seal.SealTouched += OnSealTouched;
+
+                _ctx.Node.AddChild(seal);
+                seal.Initialize(model, _ctx.SealSize);
+
+                seal.Position = _ctx.ConvertPosition(index.X, -1);
+
+                seal.Model.MoveTo = _ctx.ConvertPosition(index.X, model.Y);
+                
+                if (GodotObject.IsInstanceValid(seal))
+                {
+                    _ctx.SealViews[index] = seal;
+                    newSeals.Add(seal);
+                }
+            }
+
+            return newSeals;
+        }
+
+        /// <summary>
         /// Render Cell on Map, which under Seal
         /// </summary>
         private void StoneCells()

@@ -18,7 +18,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     {
                         seal.QueueFree();
                         _ctx.SealViews[new Vector2I(seal.Model.X, seal.Model.Y)] = null;
-                        _ctx.MapData[seal.Model.X, seal.Model.Y].Type = null;
+                        _ctx.MapData[seal.Model.X, seal.Model.Y].Type = ObjectType.Null;
                         CellNull.Add(_ctx.MapData[seal.Model.X, seal.Model.Y]);
                     }
                 }

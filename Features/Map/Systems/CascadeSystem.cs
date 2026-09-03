@@ -15,12 +15,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public async Task PlayCascadeAsync()
         {
             var moveSeals = CalcCascade();
-            foreach(var seal in moveSeals)
-            {
-                seal.Model.MoveTo = _ctx.ConvertPosition((int)seal.Model.MoveTo.Value.X,
-                                                         (int)seal.Model.MoveTo.Value.Y);
-            }
-
             await MapAnimService.PlayCascade(moveSeals);
         }
 
@@ -45,7 +39,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         Seal seal = _ctx.SealViews[from];
                         seal.Model.X = to.X;
                         seal.Model.Y = to.Y;
-                        seal.Model.MoveTo = to;
+                        seal.Model.MoveTo = _ctx.ConvertPosition(to.X, to.Y);
                         moves.Add(seal);
 
                         // Update cell on Map
