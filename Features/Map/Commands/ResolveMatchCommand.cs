@@ -11,10 +11,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private readonly MapContextModel _ctx = ctx;
         private List<HashSet<Seal>> _initialMatches = [.. matches];
 
-        private DestroySystem _destroySystem;
+        //private DestroySystem _destroySystem;
         public async Task ExecuteAync()
         {
-            _destroySystem = new DestroySystem(_ctx);
+            //_destroySystem = new DestroySystem(_ctx);
             while (_initialMatches.Count > 0)
             {
                 await ProcessMatch();
@@ -31,16 +31,13 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 {
                     // Destroy seals
                     // and collect cell null on map
-                    await _destroySystem.Execute(match);
+                    new DestroySystem(_ctx).Execute(match);
                     _initialMatches.RemoveAt(i);
                 }
             }
             
             // Play cascade
-            await new CascadeSystem(_ctx, _destroySystem.CellNull).PlayCascadeAsync();
-
-            // Respawn seals
-            await new ReFillSystem(_ctx).RefillAync();
+            await new CascadeSystem(_ctx).PlayCascadeAsync();
         }
     }
 }

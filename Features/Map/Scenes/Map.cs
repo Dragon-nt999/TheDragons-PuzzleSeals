@@ -76,7 +76,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 OffsetX         = _offsetX,
                 OffsetY         = _offsetY,
                 Width           = _width,
-                Height          = _height
+                Height          = _height,
+                OnSealTouched   = OnSealTouched,
             };
 
             // Render

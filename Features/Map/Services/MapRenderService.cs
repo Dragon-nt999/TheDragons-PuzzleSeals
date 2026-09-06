@@ -68,7 +68,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         /// </summary>
         private void Seals()
         {
-            Dictionary<Vector2I, SealModel> seals = SpawnSystem.SpawnSeals(_ctx.MapData);
+            Dictionary<Vector2I, SealModel> seals = SpawnSystem.SpawnSealsData(_ctx.MapData);
             foreach(var (index, model) in seals)
             {
                 Seal seal = _ctx.SealScene.Instantiate<Seal>();
@@ -87,34 +87,28 @@ namespace TheDragonsPuzzleSeals.Features.Map
         }
 
         /// <summary>
-        /// Render Seals for Refill System
+        /// Render one seal for Refill on Map
         /// </summary>
-        public List<Seal> ReSpawnSeals(Dictionary<Vector2I, SealModel> sealData)
+        public Seal RespawnOneSeal(SealModel model)
         {
-            List<Seal> newSeals = [];
+            if(model == null) return null;
 
-            if(sealData == null || sealData.Count == 0) return newSeals;
+            Seal seal = _ctx.SealScene.Instantiate<Seal>();
+            seal.SealTouched += OnSealTouched;
 
-            foreach(var (index, model) in sealData)
+            _ctx.Node.AddChild(seal);
+            seal.Initialize(model, _ctx.SealSize);
+
+            seal.Position = _ctx.ConvertPosition(model.X, -1);
+
+            seal.Model.MoveTo = _ctx.ConvertPosition(model.X, model.Y);
+            
+            if (GodotObject.IsInstanceValid(seal))
             {
-                Seal seal = _ctx.SealScene.Instantiate<Seal>();
-                seal.SealTouched += OnSealTouched;
-
-                _ctx.Node.AddChild(seal);
-                seal.Initialize(model, _ctx.SealSize);
-
-                seal.Position = _ctx.ConvertPosition(index.X, -1);
-
-                seal.Model.MoveTo = _ctx.ConvertPosition(index.X, model.Y);
-                
-                if (GodotObject.IsInstanceValid(seal))
-                {
-                    _ctx.SealViews[index] = seal;
-                    newSeals.Add(seal);
-                }
+                _ctx.SealViews[new Vector2I(model.X, model.Y)] = seal;
             }
 
-            return newSeals;
+            return seal;
         }
 
         /// <summary>

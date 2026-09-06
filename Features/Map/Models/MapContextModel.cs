@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 
 namespace TheDragonsPuzzleSeals.Features.Map
@@ -16,6 +17,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public int Width { get; init; }
         public int Height { get; init; }
         public Dictionary<Vector2I, Seal> SealViews = [];
+
+        public Action<Seal, Vector2> OnSealTouched;
 
         /// <summary>
         /// Calculate position Seal or somethings else from SealMode[X, Y]
