@@ -87,8 +87,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
         }
 
         /// <summary>
-        /// Render one seal for Refill on Map
+        /// Render one seal with data from cascade system
+        /// default: new seal is generated will have Y = -1
+        /// and region = true with region.X = 0; region.Y = 0
         /// </summary>
+        /// <param name="model"></param>
+        /// <returns>Seal</returns>
         public Seal RespawnOneSeal(SealModel model)
         {
             if(model == null) return null;
@@ -99,9 +103,14 @@ namespace TheDragonsPuzzleSeals.Features.Map
             _ctx.Node.AddChild(seal);
             seal.Initialize(model, _ctx.SealSize);
 
-            seal.Position = _ctx.ConvertPosition(model.X, -1);
+            var startPos = seal.Mask.Size / 2f;
+            seal.Sprite.Position = new Vector2(startPos.X, startPos.Y - seal.Mask.Size.Y);
+
+            seal.Position = _ctx.ConvertPosition(model.X, 0);
 
             seal.Model.MoveTo = _ctx.ConvertPosition(model.X, model.Y);
+
+            seal.Model.Action = SealAction.Refill;
             
             if (GodotObject.IsInstanceValid(seal))
             {

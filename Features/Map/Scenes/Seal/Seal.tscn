@@ -9,9 +9,22 @@ size = Vector2(153, 154)
 [node name="Seal" type="Area2D" unique_id=1210145361]
 script = ExtResource("1_m0muf")
 
-[node name="Object" type="Sprite2D" parent="." unique_id=762299255]
-texture = ExtResource("1_0eada")
-
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=2147456407]
 position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_bnnr1")
+
+[node name="Mask" type="Control" parent="." unique_id=1660931391]
+custom_minimum_size = Vector2(224, 224)
+clip_contents = true
+layout_mode = 3
+anchors_preset = 0
+offset_left = -112.0
+offset_top = -112.0
+offset_right = 112.0
+offset_bottom = 112.0
+pivot_offset = Vector2(112, 112)
+mouse_filter = 2
+
+[node name="Object" type="Sprite2D" parent="Mask" unique_id=762299255]
+position = Vector2(114, 114)
+texture = ExtResource("1_0eada")

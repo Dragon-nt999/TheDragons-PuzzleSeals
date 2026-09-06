@@ -73,11 +73,35 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
                     float delay = (float)GD.RandRange(0.01, 0.1);
 
+                    if(seal.Model.Action == SealAction.Refill)
+                    {
+                        tweens.Add(DropSealToOriginal(seal));
+                    }
+
                     tweens.Add(MoveTo(seal, delay, duration, Animtype.Fall));
                 }
 
                 await WaitAll(tweens);
             }
+        }
+
+        /// <summary>
+        /// Drop seal to mask position
+        /// Use for new Seal
+        /// </summary>
+        /// <param name="seal"></param>
+        /// <param name="duration"></param>
+        /// <returns>Tween</returns>
+        private static Tween DropSealToOriginal(Seal seal,
+                                    double duration = 0.3f)
+        {
+            Tween tween = seal.CreateTween();
+            
+            var target = seal.Mask.Size / 2f;
+
+            tween.TweenProperty(seal.Sprite, "position", target, duration);
+
+            return tween;
         }
     }
 }

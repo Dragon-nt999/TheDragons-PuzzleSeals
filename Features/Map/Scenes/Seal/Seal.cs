@@ -8,11 +8,13 @@ namespace TheDragonsPuzzleSeals.Features.Map
     {
         [Signal]
         public delegate void SealTouchedEventHandler(Seal seal, Vector2 mousePosition);
-        private Sprite2D _sprite;
+        public Sprite2D Sprite {get; set;}
+        public Control Mask {get; set;}
         public SealModel Model;
         public override void _Ready()
         {
-            _sprite = GetNode<Sprite2D>("Object");
+            Mask   = GetNode<Control>("Mask");
+            Sprite = GetNode<Sprite2D>("Mask/Object");
             InputEvent += OnTouchedEvent;
         }
 
@@ -27,15 +29,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
             if (model == null) return;
             Model = model;
 
-            Vector2 textureSize = _sprite.Texture.GetSize();
-            Vector2 scale = new Vector2(size / textureSize.X, size / textureSize.Y);
-            _sprite.Scale = scale;
+            Vector2 textureSize = Sprite.Texture.GetSize();
+            Vector2 scale       = new(size / textureSize.X, size / textureSize.Y);
+            Mask.Scale          = scale;
 
             string texturePath = $"res://Assets/Textures/Seals/seal_{model.Type}.png";
 
             try
             {
-                _sprite.Texture = GD.Load<Texture2D>(texturePath);
+                Sprite.Texture = GD.Load<Texture2D>(texturePath);
             } catch(Exception e)
             {
                 GD.Print("Error when loading texture " + e.Message);

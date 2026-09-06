@@ -30,13 +30,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 if (match != null)
                 {
                     // Destroy seals
-                    // and collect cell null on map
-                    new DestroySystem(_ctx).Execute(match);
+                    await new DestroySystem(_ctx).Execute(match);
                     _initialMatches.RemoveAt(i);
                 }
             }
             
-            // Play cascade
+            // Play cascade seals
             await new CascadeSystem(_ctx).PlayCascadeAsync();
         }
     }
