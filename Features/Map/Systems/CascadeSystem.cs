@@ -20,6 +20,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             // Play animation cascade
             await MapAnimService.PlayCascade(_sealsCascadeList);
+
+            // Reset Seals
+            ResetSealsAfterCascade();
         }
 
         /// <summary>
@@ -142,6 +145,14 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 .Select(g => g.First())];
 
             return distinct;
+        }
+
+        private void ResetSealsAfterCascade()
+        {
+            foreach(Seal seal in _sealsCascadeList)
+            {
+                if(GodotObject.IsInstanceValid(seal)) seal.Reset();
+            }
         }
     }
 
