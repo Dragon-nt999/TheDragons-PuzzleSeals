@@ -6,25 +6,25 @@ namespace TheDragonsPuzzleSeals.Features.Map
 {
     public static class SpawnSystem
     {
-        public static Dictionary<Vector2I, SealModel> SpawnSeals(MapObjectModel[,] map)
+        private static readonly SealType[] _poolType  =
+                [
+                    SealType.red,
+                    SealType.blue,
+                    SealType.green,
+                    SealType.yellow,
+                ];
+        public static Dictionary<Vector2I, SealModel> SpawnSealsData(MapObjectModel[,] map)
         {
             Dictionary<Vector2I, SealModel> seals = [];
-            Random rand          = new Random();
-            SealType[] poolType  =
-            {
-                SealType.red,
-                SealType.blue,
-                SealType.green,
-                SealType.yellow,
-            };
-
+            Random rand = new();
+            
             foreach(var obj in map)
             {
                 SealType type;
 
                 do
                 {
-                    type = poolType[rand.Next(poolType.Length)];
+                    type = _poolType[rand.Next(_poolType.Length)];
                 } while (
                             (obj.X >= 2 && seals[new Vector2I(obj.X - 1, obj.Y)].Type 
                                                    == type && seals[new Vector2I(obj.X - 2, obj.Y)].Type == type)
@@ -38,9 +38,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             return seals;
         }
-
-        
-
     }
 
 }
