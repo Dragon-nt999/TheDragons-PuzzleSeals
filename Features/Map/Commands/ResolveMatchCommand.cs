@@ -9,34 +9,47 @@ namespace TheDragonsPuzzleSeals.Features.Map
                                      List<HashSet<Seal>> matches) : ICommand
     {
         private readonly MapContextModel _ctx = ctx;
-        private List<HashSet<Seal>> _initialMatches = [.. matches];
+        //private List<HashSet<Seal>> _initialMatches = [.. matches];
+        private List<HashSet<Seal>> _initialMatches = matches;
 
-        //private DestroySystem _destroySystem;
+        /// <summary>
+        /// Main execution function
+        /// </summary>
+        /// <returns></returns>
         public async Task ExecuteAync()
         {
-            //_destroySystem = new DestroySystem(_ctx);
             while (_initialMatches.Count > 0)
             {
                 await ProcessMatch();
-                _initialMatches = MatchSystem.FindMatch(_ctx);
-            }    
+                _initialMatches = MatchSystem.FindAndGroupMatch(_ctx);
+            }
         }
 
+        /// <summary>
+        /// Calls the Destroy System to destroy matched seals
+        /// Calls the Cascade System to cascading seals and spawn new seals
+        /// </summary>
+        /// <returns></returns>
         private async Task ProcessMatch()
         {
             for (var i = _initialMatches.Count - 1; i >= 0; i--)
             {
                 var match = _initialMatches[i];
-                if (match != null)
+                if (match.Count <= 3)
                 {
-                    // Destroy seals
                     await new DestroySystem(_ctx).Execute(match);
-                    _initialMatches.RemoveAt(i);
+                } else
+                {
+                    await new SpawnSpecialSealsSystem(_ctx, match).Execute();
                 }
+                _initialMatches.RemoveAt(i);
             }
             
             // Play cascade seals
             await new CascadeSystem(_ctx).PlayCascadeAsync();
+
+            // Reset All Seals
+            _ctx.ResetAllSeals();   
         }
     }
 }

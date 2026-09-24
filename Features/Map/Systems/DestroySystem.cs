@@ -11,12 +11,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
         {
             if (sealMatches.Count > 0)
             {
+                List<Tween> tweens = [];
                 foreach (var seal in sealMatches)
                 {
                     if(GodotObject.IsInstanceValid(seal))
                     {
                         Tween tween = seal.CreateTween();
-                        tween.TweenInterval(0.05f);
+                        float delay = seal.Model.Y * 0.05f;
+                        delay = Mathf.Clamp(delay, 0.0f, 0.05f);
+                        tween.TweenInterval(delay);
                         
                         tween.Parallel().TweenProperty(seal, "scale", Vector2.Zero, 0.1f);
                         tween.Parallel().TweenProperty(seal, "modulate:a", 0f, 0.1f);
@@ -30,9 +33,11 @@ namespace TheDragonsPuzzleSeals.Features.Map
                             }
                         ));
 
-                        await seal.ToSignal(tween, Tween.SignalName.Finished);
+                        tweens.Add(tween);
                     }
                 }
+
+                await MapAnimService.WaitAll(tweens);
             }
         }
     }

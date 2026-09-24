@@ -8,6 +8,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class MapAnimService()
     {
+        /// <summary>
+        /// Play swap animation
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
         public static async Task PlaySwap(Seal s1, Seal s2)
         {
             List<Tween> tweens = [];
@@ -18,7 +24,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
             await WaitAll(tweens);
         }
 
-        private static async Task WaitAll(List<Tween> tweens)
+        /// <summary>
+        /// Helper for await all tween
+        /// </summary>
+        /// <param name="tweens"></param>
+        /// <returns></returns>
+        public static async Task WaitAll(List<Tween> tweens)
         {
             var tasks = tweens.Where(t => t != null && t.IsValid())
                               .Select(async t => await t.ToSignal(t, Tween.SignalName.Finished));
@@ -26,9 +37,17 @@ namespace TheDragonsPuzzleSeals.Features.Map
             if(tasks.Any()) await Task.WhenAll(tasks);
         }
 
+        /// <summary>
+        /// Move seal by swap or cascade
+        /// </summary>
+        /// <param name="seal"></param>
+        /// <param name="delay"></param>
+        /// <param name="duration"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static Tween MoveTo(Seal seal, 
                                     double delay = 0, 
-                                    double duration = 0.3,
+                                    double duration = 0.2,
                                     Animtype type = Animtype.Move)
         {
             if (!GodotObject.IsInstanceValid(seal)) return null;
@@ -53,6 +72,11 @@ namespace TheDragonsPuzzleSeals.Features.Map
             return tween;
         }
 
+        /// <summary>
+        /// Plays cascading seals
+        /// </summary>
+        /// <param name="seals"></param>
+        /// <returns></returns>
         public static async Task PlayCascade(List<Seal> seals)
         {
             if(seals.Count > 0)
@@ -69,10 +93,11 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     float distance = Mathf.Abs(seal.Model.MoveTo.Value.Y - seal.Position.Y);
                     float gravityFactor = 0.08f;
                     float duration = distance * gravityFactor * gravityFactor;
-                    duration = Mathf.Clamp(duration, 0.0f, 1.0f);
+                    duration = Mathf.Clamp(duration, 0.0f, 0.6f);
 
                     float delay = (float)GD.RandRange(0.01, 0.1);
 
+                    // Apply to new seal on Map
                     if(seal.Model.Action == SealAction.Refill)
                     {
                         tweens.Add(DropSealToOriginal(seal));
@@ -93,7 +118,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         /// <param name="duration"></param>
         /// <returns>Tween</returns>
         private static Tween DropSealToOriginal(Seal seal,
-                                    double duration = 0.3f)
+                                    double duration = 0.2f)
         {
             Tween tween = seal.CreateTween();
             

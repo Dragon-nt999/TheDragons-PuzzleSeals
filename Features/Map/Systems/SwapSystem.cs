@@ -25,7 +25,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             }
 
             data["SwapFrom"] = new Vector2I(currentX, currentY);
-            data["SwapTo"] = new Vector2I(targetX, targetY);
+            data["SwapTo"]   = new Vector2I(targetX, targetY);
 
             return data;
         }
