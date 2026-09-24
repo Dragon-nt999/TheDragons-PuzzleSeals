@@ -6,7 +6,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
     {
         public int X { get; set; } = x;
         public int Y { get; set; } = y;
-        public SealType Type { get; } = type;
+        public SealType Type { get; set; } = type;
         public SealAction? Action { get; set; } = null;
         public Vector2? MoveTo { get; set; } = null;
     }

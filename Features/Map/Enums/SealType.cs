@@ -8,7 +8,11 @@ namespace TheDragonsPuzzleSeals.Features.Map
         blue,
         red,
         green,
-        yellow
+        yellow,
+        match_4_H,
+        match_4_V,
+        match_5,
+        match_TL,
     }
 
     public enum SealAction

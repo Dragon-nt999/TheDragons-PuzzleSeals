@@ -33,6 +33,20 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             return new Vector2(xPos, yPos);
         }
+
+        /// <summary>
+        /// Reset all seals when Resolve Match end
+        /// </summary>
+        public void ResetAllSeals()
+        {
+            foreach(var seal in SealViews)
+            {
+                if(seal.Value.Model.Action == SealAction.Swap)
+                {
+                    seal.Value.Reset();
+                }
+            }    
+        }
     }
 
 }

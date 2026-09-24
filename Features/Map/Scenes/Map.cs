@@ -136,10 +136,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 await swapCommand.ExecuteAync();
 
                 // Finding matches
-                List<HashSet<Seal>> matches = MatchSystem.FindMatch(_ctx);
+                List<HashSet<Seal>> matches = MatchSystem.FindAndGroupMatch(_ctx);
 
                 // Processing matches
-                if(MatchSystem.HasMatches(matches))
+                if(matches.Count > 0)
                 {
                     await new ResolveMatchCommand(_ctx, matches).ExecuteAync();
                 } else

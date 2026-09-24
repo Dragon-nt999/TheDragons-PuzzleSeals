@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using Godot;
 
-
 /// <summary>
 /// Custom Static Class that Receives Godot.GD calls and forwards them to VisualStudio Debuger (console) and Godot.GD class.
 /// Comment this out, or change the Class name to GD to use the original Godot.GD class.

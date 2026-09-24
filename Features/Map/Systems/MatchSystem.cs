@@ -1,18 +1,25 @@
 using Godot;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public static class MatchSystem
     {
-        public static List<HashSet<Seal>> FindMatch(MapContextModel ctx)
+        /// <summary>
+        /// Find and group match by number of seals
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        public static List<HashSet<Seal>> FindAndGroupMatch(MapContextModel ctx)
         {
             if (ctx.SealViews == null || ctx.SealViews.Count == 0) return null;
             List<HashSet<Seal>> finalMatches = [];
-            List<HashSet<Seal>> rawMatches   = FindAllMap(ctx);
+            List<HashSet<Seal>> rawMatches = FindAllMatch(ctx);
 
             if(rawMatches.Count == 0) return finalMatches;
 
+            // Group match by type (match 4 or L, T)
             foreach(var group in rawMatches)
             {
                 var mergeGroup = new HashSet<Seal>(group);
@@ -31,7 +38,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
             return finalMatches;
         }
 
-        private static List<HashSet<Seal>> FindAllMap(MapContextModel ctx)
+        /// <summary>
+        /// Find all matches on Map with with and height
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        private static List<HashSet<Seal>> FindAllMatch(MapContextModel ctx)
         {
             List<HashSet<Seal>> results = [];
             HashSet<Seal> temps = [];
@@ -39,6 +51,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             //  Find by Horizonal
             for(int y = 0; y < ctx.Height; y++)
             {
+                
                 for(int x = 0; x < ctx.Width - 2; x++)
                 {
                     Seal s1 = ctx.SealViews[new Vector2I(x, y)];
@@ -52,13 +65,14 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         temps.Add(s1);
                         temps.Add(s2);
                         temps.Add(s3);
+                    } else
+                    {
+                        if(temps.Count > 2)
+                        {
+                            results.Add(temps);
+                            temps = [];
+                        }
                     }
-                }
-
-                if(temps.Count > 2)
-                {
-                    results.Add(temps);
-                    temps = [];
                 }
             }
 
@@ -78,33 +92,26 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         temps.Add(s1);
                         temps.Add(s2);
                         temps.Add(s3);
+                    } else
+                    {
+                        if(temps.Count > 2)
+                        {
+                            results.Add(temps);
+                            temps = [];
+                        }
                     }
-                }
-
-                if(temps.Count > 2)
-                {
-                    results.Add(temps);
-                    temps = [];
                 }
             }
 
             return results;
-        } 
-
-        public static bool HasMatches(List<HashSet<Seal>> matches)
-        {
-            if (matches == null) return false;
-            foreach(var match in matches)
-            {
-                if(match != null && match.Count > 0)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
+        /// <summary>
+        /// Helper detect two seal is same type
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        /// <returns></returns>
         private static bool IsSametype(SealModel s1, SealModel s2)
         {
             return s1.Type == s2.Type;
