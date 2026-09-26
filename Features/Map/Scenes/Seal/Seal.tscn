@@ -28,3 +28,5 @@ mouse_filter = 2
 [node name="Object" type="Sprite2D" parent="Mask" unique_id=762299255]
 position = Vector2(114, 114)
 texture = ExtResource("1_0eada")
+
+[node name="VFXAnchor" type="Marker2D" parent="." unique_id=177677663]

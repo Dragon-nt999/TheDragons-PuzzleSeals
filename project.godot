@@ -15,6 +15,10 @@ run/main_scene="uid://f5swmvcx6wvw"
 config/features=PackedStringArray("4.7", "C#", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameEventBus="*uid://24h8t1bd06wd"
+
 [display]
 
 window/size/viewport_width=1080

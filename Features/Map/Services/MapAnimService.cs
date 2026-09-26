@@ -18,6 +18,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
         {
             List<Tween> tweens = [];
 
+            tweens.Add(SealGlow(s1));
+            tweens.Add(SealGlow(s2));
             tweens.Add(MoveTo(s1));
             tweens.Add(MoveTo(s2));
 
@@ -125,6 +127,25 @@ namespace TheDragonsPuzzleSeals.Features.Map
             var target = seal.Mask.Size / 2f;
 
             tween.TweenProperty(seal.Sprite, "position", target, duration);
+
+            return tween;
+        }
+
+        public static Tween SealGlow(Seal seal, float glowIntensity = 2.0f, double duration = 0.1f)
+        {
+            Tween tween = seal.CreateTween();
+
+            tween.TweenProperty(seal.Sprite, 
+                                "self_modulate",
+                                new Color(glowIntensity, glowIntensity, glowIntensity, 1f),
+                                duration
+                                );
+
+            tween.TweenProperty(seal.Sprite,
+                                "self_modulate",
+                                Colors.White,
+                                duration
+                                );
 
             return tween;
         }
