@@ -1,11 +1,20 @@
 using Godot;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Linq;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public static class MatchSystem
     {
+        private static readonly IReadOnlyList<SealType> AllowSealType=
+        [
+            SealType.blue,
+            SealType.red,
+            SealType.green,
+            SealType.yellow
+        ];
+
         /// <summary>
         /// Find and group match by number of seals
         /// </summary>
@@ -65,13 +74,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         temps.Add(s1);
                         temps.Add(s2);
                         temps.Add(s3);
-                    } else
+                    }
+
+                    if(temps.Count > 2)
                     {
-                        if(temps.Count > 2)
-                        {
-                            results.Add(temps);
-                            temps = [];
-                        }
+                        results.Add(temps);
+                        temps = [];
                     }
                 }
             }
@@ -92,13 +100,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         temps.Add(s1);
                         temps.Add(s2);
                         temps.Add(s3);
-                    } else
+                    }
+
+                    if(temps.Count > 2)
                     {
-                        if(temps.Count > 2)
-                        {
-                            results.Add(temps);
-                            temps = [];
-                        }
+                        results.Add(temps);
+                        temps = [];
                     }
                 }
             }
@@ -114,6 +121,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         /// <returns></returns>
         private static bool IsSametype(SealModel s1, SealModel s2)
         {
+            if(!AllowSealType.Contains(s1.Type) || !AllowSealType.Contains(s2.Type)) return false;
             return s1.Type == s2.Type;
         }
     }

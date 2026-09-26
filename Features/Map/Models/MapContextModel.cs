@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using TheDragonsPuzzleSeals.Core.Utils;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -41,9 +42,12 @@ namespace TheDragonsPuzzleSeals.Features.Map
         {
             foreach(var seal in SealViews)
             {
-                if(seal.Value.Model.Action == SealAction.Swap)
+                if(GDObject.Check(seal.Value))
                 {
-                    seal.Value.Reset();
+                    if(seal.Value.Model.Action == SealAction.Swap)
+                    {
+                        seal.Value.Reset();
+                    }
                 }
             }    
         }
