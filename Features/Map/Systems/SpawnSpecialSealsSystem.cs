@@ -24,7 +24,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             CollectMergeSeals();
             
             await PlayMergeSealsAndDestroy();
-            _= PlaySpawnSpecialSeal();
+            await PlaySpawnSpecialSeal();
         }
 
         private void EvaluateSpecialSeal()
@@ -280,7 +280,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
         private async Task PlaySpawnSpecialSeal()
         {
-            List<Tween> tweens = [];
+            if(!GDObject.Check(_specialSeal)) return;
+
+            //List<Tween> tweens = [];
             Tween tween = _specialSeal.CreateTween();
 
             tween.SetTrans(Tween.TransitionType.Back); 
@@ -292,7 +294,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             _specialSeal.Sprite.Texture = GD.Load<Texture2D>($"res://Assets/Textures/Seals/{_typeSpecialSeal}.png");
 
-            tween.TweenProperty(_specialSeal, "scale", Vector2.One * 1.2f, 0.2f);
+            tween.TweenProperty(_specialSeal, "scale", Vector2.One * 1.1f, 0.2f);
 
             tween.TweenCallback(Callable.From(
                 () =>
@@ -301,9 +303,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 }
             ));
 
-            tweens.Add(tween);
-
-            await MapAnimService.WaitAll(tweens);
+            await _specialSeal.ToSignal(tween, Tween.SignalName.Finished);
         }
     }
 }
