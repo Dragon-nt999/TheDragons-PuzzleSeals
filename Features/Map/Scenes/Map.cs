@@ -13,8 +13,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
         private Control _mapArea;
 
-        private readonly int _width = 9;
-        private readonly int _height = 11;
+        private readonly int _width        = 9;
+        private readonly int _height       = 11;
         private readonly float maxSealSize = 116;
         private float _sealSize;
 
@@ -127,8 +127,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 return;
             }
 
-            if ((_seletedSeal.Model.X >= 0 && _seletedSeal.Model.X < _width)
-                    && (_seletedSeal.Model.Y >= 0 && _seletedSeal.Model.Y < _height))
+            if (_seletedSeal.Model.X >= 0 && _seletedSeal.Model.X < _width
+                    && _seletedSeal.Model.Y >= 0 && _seletedSeal.Model.Y < _height)
             {
 
                 // Swap seals

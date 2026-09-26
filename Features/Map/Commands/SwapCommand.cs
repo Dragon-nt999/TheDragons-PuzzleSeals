@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheDragonsPuzzleSeals.Core.Events;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -34,6 +35,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
             seal1.Model.MoveTo = _ctx.ConvertPosition(target2.X, target2.Y);
             seal2.Model.MoveTo = _ctx.ConvertPosition(target1.X, target1.Y);
 
+            // Bus Events to Hightlight StoneCell
+            GameEventBus.Instance.Publish(
+                new SwapExecutedEvent(
+                    target1,
+                    target2
+                )
+            );
+
+            // Play Animation
             await MapAnimService.PlaySwap(seal1, seal2);
 
             seal1.Model.Action = SealAction.Swap;

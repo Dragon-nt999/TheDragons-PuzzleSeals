@@ -300,6 +300,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 () =>
                 {
                     _specialSeal.Model.Type = _typeSpecialSeal;
+                    _specialSeal.ZIndex = 0;
                 }
             ));
 
