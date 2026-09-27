@@ -11,10 +11,14 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public Sprite2D Sprite {get; set;}
         public Control Mask {get; set;}
         public SealModel Model;
+        public Marker2D VfxAnchor;
+        public RemoteTransform2D VfxRemote;
         public override void _Ready()
         {
-            Mask   = GetNode<Control>("Mask");
-            Sprite = GetNode<Sprite2D>("Mask/Object");
+            Mask        = GetNode<Control>("Mask");
+            Sprite      = GetNode<Sprite2D>("Mask/Object");
+            VfxAnchor   = GetNode<Marker2D>("VFXAnchor");
+            VfxRemote   = GetNode<RemoteTransform2D>("VFXRemote");
             InputEvent += OnTouchedEvent;
         }
 

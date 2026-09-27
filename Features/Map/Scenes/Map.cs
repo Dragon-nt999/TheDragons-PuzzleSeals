@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheDragonsPuzzleSeals.Core.Managers;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -40,6 +41,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
             // Wait one frame for the parent container to calculate its actual size
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
+            // Load VFX
+            VfxManager.Instance.ClearCache();
+            VfxManager.Instance.PreloadVfx(VfxType.Explosion);
+            
             // Calculate Seal size, offset
             Vector2 mapSize = _mapArea.Size;
 

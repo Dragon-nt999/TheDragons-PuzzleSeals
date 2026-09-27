@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TheDragonsPuzzleSeals.Core.Managers;
 using TheDragonsPuzzleSeals.Core.Utils;
 
 namespace TheDragonsPuzzleSeals.Features.Map
@@ -16,6 +17,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private readonly List<Seal> _sealToMergeList = [];
         private bool _hasFiveSealsMatch = false;
         private Seal _intersectSeal = null;
+
+        private Color? _particleColor = null;
 
         public async Task Execute()
         {
@@ -272,6 +275,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     ));
 
                     tweens.Add(tween);
+
+                    // Set color for Particle
+                    _particleColor = seal.Model.Type.GetColor();
                 }
             }
 
@@ -282,7 +288,16 @@ namespace TheDragonsPuzzleSeals.Features.Map
         {
             if(!GDObject.Check(_specialSeal)) return;
 
-            //List<Tween> tweens = [];
+            List<Tween> tweens = [];
+
+            // Play Vfx Explosion
+            Tween vfxTween = VfxManager.Instance.Play(VfxType.Explosion, 
+                                                            _specialSeal.VfxRemote,
+                                                            Vector2.One * 3f,
+                                                            _particleColor);
+
+            tweens.Add(vfxTween);
+            
             Tween tween = _specialSeal.CreateTween();
 
             tween.SetTrans(Tween.TransitionType.Back); 
@@ -304,7 +319,9 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 }
             ));
 
-            await _specialSeal.ToSignal(tween, Tween.SignalName.Finished);
+            tweens.Add(tween);
+
+            await MapAnimService.WaitAll(tweens);
         }
     }
 }

@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheDragonsPuzzleSeals.Core.Managers;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -21,8 +22,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         delay = Mathf.Clamp(delay, 0.0f, 0.05f);
                         tween.TweenInterval(delay);
                         
-                        tween.Parallel().TweenProperty(seal, "scale", Vector2.Zero, 0.1f);
-                        tween.Parallel().TweenProperty(seal, "modulate:a", 0f, 0.1f);
+                        tween.Parallel().TweenProperty(seal, "scale", Vector2.One * 1.3f, 0.1f);
+                        tween.Parallel().TweenProperty(seal.Sprite, "self_modulate",
+                                                       new Color(2f, 2f, 2f, 1f),
+                                                        0.1f);
 
                         tween.TweenCallback(Callable.From(
                             () =>
@@ -34,6 +37,14 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         ));
 
                         tweens.Add(tween);
+
+                        // Play Vfx Explosion
+                        Tween vfxTween = VfxManager.Instance.Play(VfxType.Explosion, 
+                                                                seal.VfxRemote,
+                                                                Vector2.One,
+                                                                seal.Model.Type.GetColor());
+
+                        tweens.Add(vfxTween);
                     }
                 }
 
