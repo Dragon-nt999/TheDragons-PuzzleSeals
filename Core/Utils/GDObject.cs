@@ -1,6 +1,5 @@
 using Godot;
 
-
 namespace TheDragonsPuzzleSeals.Core.Utils;
 public static class GDObject
 {

@@ -22,4 +22,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
         Explosion,
         Refill,
     }
+
+    public static class ColorForParticleBySealType
+    {
+        public static Color GetColor(this SealType type) => type switch
+        {
+            SealType.yellow => new Color("#D4C569"),
+            SealType.red    => new Color("#FE968C"),
+            SealType.green  => new Color("#55BA64"),
+            _               => new Color("#418DA2")
+        };
+    }
 }

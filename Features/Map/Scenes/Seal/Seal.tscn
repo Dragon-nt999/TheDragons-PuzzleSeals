@@ -30,3 +30,6 @@ position = Vector2(114, 114)
 texture = ExtResource("1_0eada")
 
 [node name="VFXAnchor" type="Marker2D" parent="." unique_id=177677663]
+
+[node name="VFXRemote" type="RemoteTransform2D" parent="." unique_id=1194492445]
+remote_path = NodePath("../VFXAnchor")
