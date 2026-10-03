@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using TheDragonsPuzzleSeals.Core.Events;
 using TheDragonsPuzzleSeals.Core.Managers;
 using TheDragonsPuzzleSeals.Core.Utils;
 
@@ -10,24 +10,26 @@ namespace TheDragonsPuzzleSeals.Features.Map
 {
     public class SpawnSpecialSealsSystem(MapContextModel ctx, HashSet<Seal> sealMatches)
     {
-        private readonly MapContextModel _ctx = ctx;
-        private readonly HashSet<Seal> _sealMatches = sealMatches;
-        private SealType _typeSpecialSeal = SealType.match_4_H;
-        private Seal _specialSeal;
+        private readonly MapContextModel _ctx        = ctx;
+        private readonly HashSet<Seal> _sealMatches  = sealMatches;
+        private SealType _typeSpecialSeal            = SealType.match_4_H;
+        private Seal _specialSeal                    = null;
         private readonly List<Seal> _sealToMergeList = [];
-        private bool _hasFiveSealsMatch = false;
-        private Seal _intersectSeal = null;
+        private bool _hasFiveSealsMatch              = false;
+        private Seal _intersectSeal                  = null;
 
-        private Color? _particleColor = null;
-
-        public async Task Execute()
+        public List<Tween> Execute()
         {
             EvaluateSpecialSeal();
             InitializeSpecialSeal();
             CollectMergeSeals();
+
+            List<Tween> tweensList = [];
             
-            await PlayMergeSealsAndDestroy();
-            await PlaySpawnSpecialSeal();
+            tweensList.AddRange(AnimMergeSealsAndDestroy());
+            tweensList.AddRange(AnimSpawnSpecialSeal());
+
+            return tweensList;
         }
 
         private void EvaluateSpecialSeal()
@@ -89,21 +91,31 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             foreach(Seal seal in _sealMatches)
             {
+                if(!GDObject.Check(seal)) return;
+
                 int x = seal.Model.X;
                 int y = seal.Model.Y;
 
-                var matchByX = FindByDiectionX(seal, minX, maxX);
-                if(matchByX.Count > 0 && sealsMatchByX.Count < matchByX.Count)
+                HashSet<Seal> matchXTemp = [];
+                HashSet<Seal> matchYTemp = [];
+
+                if(x == maxX)
                 {
-                    sealsMatchByX = matchByX;
+                    matchXTemp = FindByDiectionX(seal, minX, maxX);
+                    if(matchXTemp.Count > sealsMatchByX.Count)
+                    {
+                        sealsMatchByX = matchXTemp;
+                    }
                 }
 
-                var matchByY = FindByDiectionY(seal, minX, maxX);
-                if(matchByY.Count > 0 && sealsMatchByY.Count < matchByY.Count)
+                if(y == maxY)
                 {
-                    sealsMatchByY = matchByY;
-                }
-                
+                    matchYTemp = FindByDiectionY(seal, minY, maxY);
+                    if(matchYTemp.Count > sealsMatchByY.Count)
+                    {
+                        sealsMatchByY = matchYTemp;
+                    }
+                }          
             }
 
             // Detect matches by 5 seals
@@ -121,21 +133,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             for(int offsetX = 1; ; offsetX++)
             {
-                int right = x + offsetX;
                 int left  = x - offsetX;
-                if(right < maxX)
-                {
-                    Seal sRight1 = _ctx.SealViews[new Vector2I(right, y)];
-                    Seal sRight2 = _ctx.SealViews[new Vector2I(right + 1, y)];
-                    if(!GDObject.Check(seal, sRight1, sRight2)) break;
-                    if(seal.Model.Type == sRight1.Model.Type &&
-                                   sRight1.Model.Type == sRight2.Model.Type )
-                    {
-                        sealsMatchByX.Add(seal);
-                        sealsMatchByX.Add(sRight1);
-                        sealsMatchByX.Add(sRight2);
-                    }
-                }
                 if(left > 0 && left >= minX)
                 {
                     Seal sLeft1 = _ctx.SealViews[new Vector2I(left, y)];
@@ -149,7 +147,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         sealsMatchByX.Add(sLeft2);
                     }
                 }
-                if(right > maxX && left < minX)
+                if(left < minX)
                 {
                     break;
                 }
@@ -166,23 +164,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             for(int offsetY = 1; ; offsetY++)
             {
-                int bot = y + offsetY;
                 int top = y - offsetY;
-
-                if(bot < maxY)
-                {
-                    Seal sBot1 = _ctx.SealViews[new Vector2I(x, bot)];
-                    Seal sBot2 = _ctx.SealViews[new Vector2I(x, bot + 1)];
-                    if(!GDObject.Check(seal, sBot1, sBot2)) break;
-
-                    if(seal.Model.Type == sBot1.Model.Type &&
-                                        sBot1.Model.Type == sBot2.Model.Type)
-                    {
-                        sealsMatchByY.Add(seal);
-                        sealsMatchByY.Add(sBot1);
-                        sealsMatchByY.Add(sBot2);
-                    }
-                }
 
                 if(top > 0 && top >= minY)
                 {
@@ -199,7 +181,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     }
                 }
 
-                if(bot > maxY && top < minY)
+                if(top < minY)
                 {
                     break;
                 }
@@ -210,9 +192,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
         private void InitializeSpecialSeal()
         {
-            var sealList = _sealMatches.ToList();
-            
-            foreach(var seal in sealList)
+            // Initialize by mark SealAction.Swap
+            foreach(var seal in _sealMatches)
             {
                 if(seal.Model.Action == SealAction.Swap)
                 {
@@ -221,6 +202,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 }
             }
 
+            // Initialize by intersect seal or random sealin list match
             if(!GDObject.Check(_specialSeal))
             {
                 if(GDObject.Check(_intersectSeal))
@@ -228,7 +210,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     _specialSeal = _intersectSeal;
                 } else
                 {
-                    _specialSeal = sealList[(int)Mathf.Round(sealList.Count / 2)];
+                    _specialSeal = _sealMatches.FirstOrDefault();
                 }
             }
         }
@@ -248,68 +230,80 @@ namespace TheDragonsPuzzleSeals.Features.Map
             }
         }
 
-        private async Task PlayMergeSealsAndDestroy()
+        private List<Tween> AnimMergeSealsAndDestroy()
         {
             List<Tween> tweens = [];
             foreach (var seal in _sealToMergeList)
             {
                 if(GodotObject.IsInstanceValid(seal))
                 {
+                    // Update data
+                    _ctx.SealViews[new Vector2I(seal.Model.X, seal.Model.Y)] = null;
+                    _ctx.MapData[seal.Model.X, seal.Model.Y].Type = ObjectType.Null;
+
+                    // Create Tween
                     Tween tween = seal.CreateTween();
                     float delay = seal.Model.X * 0.05f;
-                    delay = Mathf.Clamp(delay, 0.0f, 0.03f);
+                    delay = Mathf.Clamp(delay, 0.005f, 0.03f);
                     tween.TweenInterval(delay);
 
                     tween.SetTrans(Tween.TransitionType.Quad); 
                     tween.SetEase(Tween.EaseType.In);
                     
+                    // Glow
+                    tween.TweenProperty(seal.Sprite,
+                                "self_modulate",
+                                new Color(2.0f, 2.0f, 2.0f, 1f),
+                                0.2f
+                                );
+                    
+                    // Move
                     tween.TweenProperty(seal, "position", seal.Model.MoveTo.Value, 0.2f);
+
+                    GameEventBus.Instance.Publish(
+                        new SwapExecutedEvent(
+                            new Vector2I(seal.Model.X, seal.Model.Y)
+                        )
+                    );
 
                     tween.TweenCallback(Callable.From(
                         () =>
                         {
                             seal.QueueFree();
-                            _ctx.SealViews[new Vector2I(seal.Model.X, seal.Model.Y)] = null;
-                            _ctx.MapData[seal.Model.X, seal.Model.Y].Type = ObjectType.Null;
                         }
                     ));
 
                     tweens.Add(tween);
-
-                    // Set color for Particle
-                    _particleColor = seal.Model.Type.GetColor();
                 }
             }
 
-            await MapAnimService.WaitAll(tweens);
+            return tweens;
         }
 
-        private async Task PlaySpawnSpecialSeal()
+        private List<Tween> AnimSpawnSpecialSeal()
         {
-            if(!GDObject.Check(_specialSeal)) return;
-
             List<Tween> tweens = [];
 
-            // Play Vfx Explosion
-            Tween vfxTween = VfxManager.Instance.Play(VfxType.Explosion, 
-                                                            _specialSeal.VfxRemote,
-                                                            Vector2.One * 3f,
-                                                            _particleColor);
-
-            tweens.Add(vfxTween);
-            
+            if(!GDObject.Check(_specialSeal)) return tweens;
+  
             Tween tween = _specialSeal.CreateTween();
+
+            tween.TweenInterval(0.35f);
+
+            tween.TweenCallback(Callable.From(
+                () =>
+                {
+                    _specialSeal.ZIndex = 9;
+                    _specialSeal.Sprite.Texture = TextureManager.Instance.GetSealTexture(_typeSpecialSeal);
+                }
+            ));
 
             tween.SetTrans(Tween.TransitionType.Back); 
             tween.SetEase(Tween.EaseType.Out);
 
-            tween.TweenProperty(_specialSeal, "scale", Vector2.One * 2f, 0.2f);
+            tween.TweenProperty(_specialSeal, "scale", Vector2.One * 2f, 0.15f);
 
-            _specialSeal.ZIndex = 9;
-
-            _specialSeal.Sprite.Texture = GD.Load<Texture2D>($"res://Assets/Textures/Seals/{_typeSpecialSeal}.png");
-
-            tween.TweenProperty(_specialSeal, "scale", Vector2.One * 1.1f, 0.2f);
+            tween.TweenProperty(_specialSeal, "scale", Vector2.One * 1.1f, 0.15f);
 
             tween.TweenCallback(Callable.From(
                 () =>
@@ -321,7 +315,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             tweens.Add(tween);
 
-            await MapAnimService.WaitAll(tweens);
+            return tweens;
         }
     }
 }

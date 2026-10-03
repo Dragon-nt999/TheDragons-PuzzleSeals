@@ -32,18 +32,22 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private const float SwipeThreshold = 35.0f;
 
         private MapContextModel _ctx; 
+        private bool _isResolvingMatch = false;
 
         public override async void _Ready()
         {
             _mapArea = GetParent<Control>();
             this.Position = Vector2.Zero;
 
+            // Avoid lag for first time swap seal
+            WarmupTweenEngine();
+
             // Wait one frame for the parent container to calculate its actual size
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 
             // Load VFX
             VfxManager.Instance.ClearCache();
-            VfxManager.Instance.PreloadVfx(VfxType.Explosion);
+            await VfxManager.Instance.PreloadAndWarmupVfx(VfxType.Explosion);
             
             // Calculate Seal size, offset
             Vector2 mapSize = _mapArea.Size;
@@ -125,6 +129,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
         private async Task HandleSwipe(Vector2 endPosition)
         {
+            if(_isResolvingMatch) return;
+
             Vector2 distance = endPosition - _startPostion;
             if(distance.Length() < SwipeThreshold)
             {
@@ -135,25 +141,31 @@ namespace TheDragonsPuzzleSeals.Features.Map
             if (_seletedSeal.Model.X >= 0 && _seletedSeal.Model.X < _width
                     && _seletedSeal.Model.Y >= 0 && _seletedSeal.Model.Y < _height)
             {
-
-                // Swap seals
-                SwapCommand swapCommand = new(_ctx, _seletedSeal, distance);
-                await swapCommand.ExecuteAync();
-
-                // Finding matches
-                List<HashSet<Seal>> matches = MatchSystem.FindAndGroupMatch(_ctx);
-
-                // Processing matches
-                if(matches.Count > 0)
+                try
                 {
-                    await new ResolveMatchCommand(_ctx, matches).ExecuteAync();
-                } else
+                    // Swap seals
+                    SwapCommand swapCommand = new(_ctx, _seletedSeal, distance);
+                    await swapCommand.ExecuteAync();
+                    
+                    // Finding matches
+                    List<HashSet<Seal>> matches = MatchSystem.FindAndGroupMatch(_ctx);
+
+                    // Processing matches
+                    if(matches.Count > 0)
+                    {
+                        _isResolvingMatch = true;
+                        await new ResolveMatchCommand(_ctx, matches).ExecuteAync();
+                    } else
+                    {
+                        await swapCommand.Undo();
+                    }
+                } 
+                finally
                 {
-                    await swapCommand.Undo();
+                    // Reset Swap
+                    _seletedSeal = null;
+                    _isResolvingMatch = false;
                 }
-
-                // Reset Swap
-                _seletedSeal = null;
             }
         }
 
@@ -194,6 +206,17 @@ namespace TheDragonsPuzzleSeals.Features.Map
                 _renderService.SealTouched -= OnSealTouched;
                 _renderService.Clear();
             }
+        }
+
+
+        private void WarmupTweenEngine()
+        {
+            var warmup = CreateTween();
+            warmup.TweenProperty(this, CanvasItem.PropertyName.SelfModulate.ToString(), Colors.White, 0.001f);
+            warmup.TweenProperty(this, Node2D.PropertyName.Scale.ToString(), Vector2.One, 0.001f);
+            warmup.TweenProperty(this, Node2D.PropertyName.Position.ToString(), Position, 0.001f);
+            warmup.CustomStep(0.001f);
+            warmup.Kill();
         }
     }
 }

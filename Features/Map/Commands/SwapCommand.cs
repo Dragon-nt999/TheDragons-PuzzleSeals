@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheDragonsPuzzleSeals.Core.Events;
+using TheDragonsPuzzleSeals.Core.Utils;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -32,13 +33,20 @@ namespace TheDragonsPuzzleSeals.Features.Map
             Seal seal1 = _ctx.SealViews[target1];
             Seal seal2 = _ctx.SealViews[target2];
 
+            if(!GDObject.Check(seal1, seal2)) return;
+
             seal1.Model.MoveTo = _ctx.ConvertPosition(target2.X, target2.Y);
             seal2.Model.MoveTo = _ctx.ConvertPosition(target1.X, target1.Y);
 
             // Bus Events to Hightlight StoneCell
             GameEventBus.Instance.Publish(
                 new SwapExecutedEvent(
-                    target1,
+                    target1
+                )
+            );
+
+            GameEventBus.Instance.Publish(
+                new SwapExecutedEvent(
                     target2
                 )
             );
@@ -48,6 +56,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             seal1.Model.Action = SealAction.Swap;
             seal2.Model.Action = SealAction.Swap;
+            
             if(isUndo)
             {
                 seal1.Reset();

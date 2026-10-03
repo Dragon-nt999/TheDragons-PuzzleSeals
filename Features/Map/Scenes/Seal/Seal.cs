@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Diagnostics;
+using TheDragonsPuzzleSeals.Core.Managers;
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     [DebuggerDisplay("Type: {Model.Type} | Index: {Model.X}, {Model.Y}")]
@@ -36,16 +37,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
             Vector2 textureSize = Sprite.Texture.GetSize();
             Vector2 scale       = new(size / textureSize.X, size / textureSize.Y);
             Mask.Scale          = scale;
-
-            string texturePath = $"res://Assets/Textures/Seals/seal_{model.Type}.png";
-
-            try
-            {
-                Sprite.Texture = GD.Load<Texture2D>(texturePath);
-            } catch(Exception e)
-            {
-                GD.Print("Error when loading texture " + e.Message);
-            }
+            
+            Sprite.Texture = TextureManager.Instance.GetSealTexture(model.Type);
         }
 
         /// <summary>

@@ -31,7 +31,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         }
 
         public static void SwapData(Dictionary<Vector2I, Seal> sealViews, 
-                             Vector2I from, Vector2I to)
+                                     Vector2I from, Vector2I to)
         {
 
             // Update seal' model

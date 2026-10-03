@@ -98,10 +98,10 @@ namespace TheDragonsPuzzleSeals.Features.Map
             if(model == null) return null;
 
             Seal seal = _ctx.SealScene.Instantiate<Seal>();
-            seal.SealTouched += OnSealTouched;
-
             _ctx.Node.AddChild(seal);
             seal.Initialize(model, _ctx.SealSize);
+
+            seal.SealTouched += OnSealTouched;
 
             var startPos = seal.Mask.Size / 2f;
             seal.Sprite.Position = new Vector2(startPos.X, startPos.Y - seal.Mask.Size.Y);
@@ -129,7 +129,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             {
                 StoneCell cell = _ctx.StoneCellScene.Instantiate<StoneCell>();
                 _ctx.Node.AddChild(cell);
-                Vector2I pos = new Vector2I(obj.X, obj.Y);
+                Vector2I pos = new(obj.X, obj.Y);
                 cell.Initialize(pos, _ctx.SealSize);
                 cell.Position = _ctx.ConvertPosition(pos.X, pos.Y);
 

@@ -9,7 +9,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
                                      List<HashSet<Seal>> matches) : ICommand
     {
         private readonly MapContextModel _ctx = ctx;
-        //private List<HashSet<Seal>> _initialMatches = [.. matches];
         private List<HashSet<Seal>> _initialMatches = matches;
 
         /// <summary>
@@ -32,24 +31,29 @@ namespace TheDragonsPuzzleSeals.Features.Map
         /// <returns></returns>
         private async Task ProcessMatch()
         {
+            List<Tween> tweensToAnimation = [];
+
             for (var i = _initialMatches.Count - 1; i >= 0; i--)
             {
                 var match = _initialMatches[i];
                 if (match.Count <= 3)
                 {
-                    await new DestroySystem(_ctx).Execute(match);
+                    tweensToAnimation = new DestroySystem(_ctx).Execute(match);
                 } else
                 {
-                    await new SpawnSpecialSealsSystem(_ctx, match).Execute();
+                    tweensToAnimation = new SpawnSpecialSealsSystem(_ctx, match).Execute();
                 }
                 _initialMatches.RemoveAt(i);
             }
+
+            // Play animtion destroy seal, merge seal, spawn special seal
+            await MapAnimService.WaitAll(tweensToAnimation);
             
             // Play cascade seals
             await new CascadeSystem(_ctx).PlayCascadeAsync();
 
-            // Reset All Seals
-            _ctx.ResetAllSeals();   
+            // Reset All Seals with SealAction: Swap, Fall, Refill
+            _ctx.ResetAllSealsByAction();   
         }
     }
 }
