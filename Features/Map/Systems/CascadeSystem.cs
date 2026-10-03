@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace TheDragonsPuzzleSeals.Features.Map
@@ -20,9 +19,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
             // Play animation cascade
             await MapAnimService.PlayCascade(_sealsCascadeList);
-
-            // Reset Seals
-            ResetSealsAfterCascade();
         }
 
         /// <summary>
@@ -33,14 +29,15 @@ namespace TheDragonsPuzzleSeals.Features.Map
         {
             // Sorting and get empty cell 
             // which has highest Y property on per column
-            List<MapObjectModel> cells = [.. SortAndGetEmptyCells()];
+            List<MapObjectModel> cells = SortAndGetEmptyCells();
+
+            if(cells.Count <= 0) return;
 
             foreach (var cell in cells)
             {
                 GetSealsAboveEmptyCell(cell);
                 FillEmptyCells();
             }
-
         }
 
         /// <summary>
@@ -53,7 +50,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
             for (int fromIndex = cell.Y; fromIndex >= 0; fromIndex--)
             {
                 var from = new Vector2I(cell.X, fromIndex);
-                var to = new Vector2I(cell.X, toIndex);
+                var to   = new Vector2I(cell.X, toIndex);
 
                 if (GodotObject.IsInstanceValid(_ctx.SealViews[from]))
                 {
@@ -61,6 +58,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     seal.Model.X = to.X;
                     seal.Model.Y = to.Y;
                     seal.Model.MoveTo = _ctx.ConvertPosition(to.X, to.Y);
+                    seal.Model.Action = SealAction.Fall;
                     _sealsCascadeList.Add(seal);
 
                     // Update type of the cell on map with type = null
@@ -136,23 +134,21 @@ namespace TheDragonsPuzzleSeals.Features.Map
         /// <returns>List of MapObject</returns>
         private List<MapObjectModel> SortAndGetEmptyCells()
         {      
-            var emptyCells = _ctx.MapData.Cast<MapObjectModel>()     
-                                        .Where(x => x.Type == ObjectType.Null)
-                                        .ToList();
+            List<MapObjectModel> emptyCell = [];
 
-            List<MapObjectModel> distinct = [.. emptyCells.OrderByDescending(arr => arr.Y)
-                .GroupBy(arr => arr.X)
-                .Select(g => g.First())];
-
-            return distinct;
-        }
-
-        private void ResetSealsAfterCascade()
-        {
-            foreach(Seal seal in _sealsCascadeList)
+            for(int x = 0; x < _ctx.Width; x++)
             {
-                if(GodotObject.IsInstanceValid(seal)) seal.Reset();
+                for(int y = _ctx.Height - 1; y >= 0; y--)
+                {
+                    if(_ctx.MapData[x, y].Type == ObjectType.Null)
+                    {
+                        emptyCell.Add(_ctx.MapData[x, y]);
+                        break;
+                    }
+                }
             }
+            
+            return emptyCell;
         }
     }
 

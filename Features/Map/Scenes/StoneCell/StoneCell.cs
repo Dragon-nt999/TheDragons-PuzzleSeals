@@ -1,13 +1,29 @@
 using Godot;
 using System;
 using TheDragonsPuzzleSeals.Core.Events;
+using TheDragonsPuzzleSeals.Core.Managers;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
     public partial class StoneCell : Node2D
     {
         private Sprite2D _sprite;
-        private int[] _shapes = { 1, 2, 3, 4 };
+        private readonly StoneCellType[] _gray = [
+            StoneCellType.cell_gray, 
+            StoneCellType.cell_gray_1,
+            StoneCellType.cell_gray_2,
+            StoneCellType.cell_gray_3,
+            StoneCellType.cell_gray_4
+        ];
+
+        private readonly StoneCellType[] _green = [
+            StoneCellType.cell_green, 
+            StoneCellType.cell_green_1,
+            StoneCellType.cell_green_2,
+            StoneCellType.cell_green_3,
+            StoneCellType.cell_green_4
+        ];
+
         private Random _rand;
         private Vector2I _position;
         public override void _Ready()
@@ -25,22 +41,14 @@ namespace TheDragonsPuzzleSeals.Features.Map
             _position           = posCell;
 
             _rand = new Random();
-            int shape = _shapes[_rand.Next(_shapes.Length)];
+            StoneCellType gray = _gray[_rand.Next(_gray.Length)];
 
-            string texturePath = $"res://Assets/Textures/StoneCell/cell_green_{shape}.png";
+            _sprite.Texture = TextureManager.Instance.GetStoneCellTexture(gray);
 
             if((posCell.Y % 2 == 0 && posCell.X % 2 == 0) || (posCell.Y % 2 != 0 && posCell.X % 2 != 0))
             {
-                texturePath = $"res://Assets/Textures/StoneCell/cell_gray_{shape}.png";
-            }
-
-            try
-            {
-                _sprite.Texture = GD.Load<Texture2D>(texturePath);
-            }
-            catch (Exception e)
-            {
-                GD.Print("Error when loading texture " + e.Message);
+                StoneCellType green = _green[_rand.Next(_green.Length)];
+                _sprite.Texture = TextureManager.Instance.GetStoneCellTexture(green);
             }
         }
         
@@ -51,7 +59,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
 
         private void OnSwapExecuted(SwapExecutedEvent @event)
         {
-            if(_position == @event.Target1 || _position == @event.Target2)
+            if(_position == @event.Target)
             {
                 Tween tween = this.CreateTween();
 

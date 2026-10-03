@@ -36,15 +36,18 @@ namespace TheDragonsPuzzleSeals.Features.Map
         }
 
         /// <summary>
-        /// Reset all seals when Resolve Match end
+        /// Reset all seals (has SealAction: Swap, Refill, Fall) 
+        /// when Resolve Match end
         /// </summary>
-        public void ResetAllSeals()
+        public void ResetAllSealsByAction()
         {
             foreach(var seal in SealViews)
             {
                 if(GDObject.Check(seal.Value))
                 {
-                    if(seal.Value.Model.Action == SealAction.Swap)
+                    if(seal.Value.Model.Action == SealAction.Swap ||
+                                seal.Value.Model.Action == SealAction.Fall ||
+                                seal.Value.Model.Action == SealAction.Refill)
                     {
                         seal.Value.Reset();
                     }

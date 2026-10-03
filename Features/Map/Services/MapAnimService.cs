@@ -95,7 +95,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
                     float distance = Mathf.Abs(seal.Model.MoveTo.Value.Y - seal.Position.Y);
                     float gravityFactor = 0.08f;
                     float duration = distance * gravityFactor * gravityFactor;
-                    duration = Mathf.Clamp(duration, 0.0f, 0.6f);
+                    duration = Mathf.Clamp(duration, 0.05f, 0.5f);
 
                     float delay = (float)GD.RandRange(0.01, 0.1);
 

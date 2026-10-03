@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bgisf32vxdrty"
-path="res://.godot/imported/topleft.png-3081e0e348b046e60b89037f3eeae6da.ctex"
+uid="uid://dd4moyt02av8t"
+path="res://.godot/imported/bot_right.png-f64b083145761b67f204a6b84d0c0248.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/FrameCell/topleft.png"
-dest_files=["res://.godot/imported/topleft.png-3081e0e348b046e60b89037f3eeae6da.ctex"]
+source_file="res://Assets/Textures/FrameCell/bot_right.png"
+dest_files=["res://.godot/imported/bot_right.png-f64b083145761b67f204a6b84d0c0248.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b5k0ic73k1qxh"
-path="res://.godot/imported/cell_highlight.png-0e22d0c3d77baff6961913d97cdc5356.ctex"
+uid="uid://cgh7mx7oaf3q7"
+path="res://.godot/imported/top_right.png-50a41c4258583ffca00dda08a3853328.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/StoneCell/cell_highlight.png"
-dest_files=["res://.godot/imported/cell_highlight.png-0e22d0c3d77baff6961913d97cdc5356.ctex"]
+source_file="res://Assets/Textures/FrameCell/top_right.png"
+dest_files=["res://.godot/imported/top_right.png-50a41c4258583ffca00dda08a3853328.ctex"]
 
 [params]
 

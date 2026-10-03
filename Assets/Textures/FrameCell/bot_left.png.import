@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://5lt38e8o3ym0"
-path="res://.godot/imported/botleft.png-b5561123f78a9250ef26397f5c5a1abe.ctex"
+path="res://.godot/imported/bot_left.png-77fdafd5a876b243cb7b152c1087374e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/FrameCell/botleft.png"
-dest_files=["res://.godot/imported/botleft.png-b5561123f78a9250ef26397f5c5a1abe.ctex"]
+source_file="res://Assets/Textures/FrameCell/bot_left.png"
+dest_files=["res://.godot/imported/bot_left.png-77fdafd5a876b243cb7b152c1087374e.ctex"]
 
 [params]
 

@@ -9,7 +9,7 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 	public partial class VfxManager : Node
 	{
 		public static VfxManager Instance { get; private set; }
-		private readonly Dictionary<VfxType, PackedScene> _loadedCache = new();
+		private readonly Dictionary<VfxType, PackedScene> _loadedCache = [];
 
 		public override void _Ready()
 		{
@@ -17,7 +17,35 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 			else QueueFree();
 		}
 
-		public void PreloadVfx(params VfxType[] types)
+		public async Task PreloadAndWarmupVfx(params VfxType[] types)
+		{
+			PreloadVfx(types);
+
+			foreach(var type in types)
+			{
+				if(_loadedCache.TryGetValue(type, out var scene))
+				{
+					var dummyVfx = scene.Instantiate<Node2D>();
+
+					dummyVfx.GlobalPosition = Vector2.Zero;
+
+					dummyVfx.Modulate = new Color(1f, 1f, 1f, 0f);
+
+					AddChild(dummyVfx);
+
+					TriggerParticleRecursively(dummyVfx);
+
+					await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+					await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+
+					dummyVfx.QueueFree();
+
+				}
+			}
+				
+		}
+
+		private void PreloadVfx(params VfxType[] types)
 		{
 			foreach(var type in types)
 			{
@@ -31,11 +59,11 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 			
 		}
 
-		public Tween Play(VfxType type, 
-							RemoteTransform2D remoteTransform,
-							Vector2? scale = null,
-							Color? color = null,
-							float duration = 1f)
+		public void Play(VfxType type, 
+						 RemoteTransform2D remoteTransform,
+						 Vector2? scale = null,
+						 Color? color = null,
+						 float duration = 1.5f)
 		{
 			if(!_loadedCache.TryGetValue(type, out var scene))
 			{
@@ -43,7 +71,7 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 
 				if(scene == null)
 				{
-					return null;
+					return;
 				}
 
 				_loadedCache[type] = scene;
@@ -52,7 +80,6 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 			var vfx = scene.Instantiate<Node2D>();
 			vfx.ZIndex = 10;
 			GetTree().CurrentScene.AddChild(vfx);
-			//vfx.GlobalPosition = position;
 			remoteTransform.RemotePath = vfx.GetPath();
 
 			// Scale Vfx
@@ -79,11 +106,33 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 					{
 						remoteTransform.RemotePath = new NodePath();
 					}
-					vfx.QueueFree();
+
+					// Remove Vfx
+					if(GDObject.Check(vfx))
+					{
+						vfx.QueueFree();
+					}
+					
 				}
 			));
+		}
 
-			return tween;
+		private static void TriggerParticleRecursively(Node node)
+		{
+			if(node is GpuParticles2D gpuP)
+			{
+				gpuP.Emitting = true;
+				gpuP.Restart();
+			} else if(node is CpuParticles2D cpuP)
+			{
+				cpuP.Emitting = true;
+				cpuP.Restart();
+			}
+
+			foreach(Node child in node.GetChildren())
+			{
+				TriggerParticleRecursively(child);
+			}
 		}
 
 		private static void SetParticleColor(Node parent, string nodeName, Color color)

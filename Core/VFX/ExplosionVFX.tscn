@@ -57,22 +57,22 @@ particles_anim_v_frames = 3
 particles_anim_loop = false
 
 [sub_resource type="Curve" id="Curve_nawoc"]
-_data = [Vector2(0.00507614, 1), 0.0, 0.12648472, 0, 0, Vector2(1, 0), -3.611473, 0.0, 0, 0]
+_data = [Vector2(0.00507614, 1), 0.0, 0.12648472, 0, 0, Vector2(1, 0.022471905), -3.611473, 0.0, 0, 0]
 point_count = 2
 
 [sub_resource type="CurveTexture" id="CurveTexture_vd6p0"]
 curve = SubResource("Curve_nawoc")
 
 [sub_resource type="Gradient" id="Gradient_mtfkr"]
-offsets = PackedFloat32Array(0, 0.19883041, 0.69005847, 1)
+offsets = PackedFloat32Array(0, 0.2631579, 0.9122807, 1)
 colors = PackedColorArray(1.1638972, 1.1638972, 1.1638972, 1, 1, 1, 1, 1, 1, 1, 1, 0.74509805, 1, 1, 1, 0)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_vd6p0"]
 gradient = SubResource("Gradient_mtfkr")
 
 [sub_resource type="Curve" id="Curve_mtfkr"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.7766498, 0.68539333), -0.7646581, -0.7646581, 0, 0, Vector2(1, 0), -2.845907, 0.0, 0, 0]
-point_count = 3
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.845907, 0.0, 0, 0]
+point_count = 2
 
 [sub_resource type="CurveTexture" id="CurveTexture_uinbj"]
 curve = SubResource("Curve_mtfkr")
@@ -86,10 +86,12 @@ spread = 90.0
 initial_velocity_min = 200.0
 initial_velocity_max = 300.0
 angular_velocity_min = -180.00002
-angular_velocity_max = 179.99998
+angular_velocity_max = 359.99997
 gravity = Vector3(0, 900, 0)
-scale_min = 0.14999999
-scale_max = 0.25
+damping_min = 10.0
+damping_max = 50.000004
+scale_min = 0.19999999
+scale_max = 0.29999998
 scale_curve = SubResource("CurveTexture_uinbj")
 color_ramp = SubResource("GradientTexture1D_vd6p0")
 alpha_curve = SubResource("CurveTexture_vd6p0")
@@ -97,6 +99,7 @@ anim_offset_max = 1.0
 
 [sub_resource type="Animation" id="Animation_vd6p0"]
 resource_name = "Explosion"
+length = 1.5
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -174,6 +177,7 @@ amount = 20
 texture = ExtResource("2_vd6p0")
 one_shot = true
 explosiveness = 1.0
+randomness = 1.0
 process_material = SubResource("ParticleProcessMaterial_h5vyg")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2000702256]

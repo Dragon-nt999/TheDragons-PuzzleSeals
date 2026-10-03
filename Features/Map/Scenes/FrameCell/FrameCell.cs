@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using TheDragonsPuzzleSeals.Core.Managers;
 
 namespace TheDragonsPuzzleSeals.Features.Map
 {
@@ -8,8 +9,37 @@ namespace TheDragonsPuzzleSeals.Features.Map
         private Sprite2D _sprite;
         private const float distanceScale = 0.05f;
         private const int distancePos = 6;
+        private readonly FrameCellType[] _bot = [
+            FrameCellType.bot_1,
+            FrameCellType.bot_2,
+            FrameCellType.bot_3,
+            FrameCellType.bot_4,
+            FrameCellType.bot_5,
+        ];
 
-        private readonly int[] _frameIndex = { 1, 2, 3, 4 };
+        private readonly FrameCellType[] _left = [
+            FrameCellType.left_1,
+            FrameCellType.left_2,
+            FrameCellType.left_3,
+            FrameCellType.left_4,
+            FrameCellType.left_5,
+        ];
+
+        private readonly FrameCellType[] _right = [
+            FrameCellType.right_1,
+            FrameCellType.right_2,
+            FrameCellType.right_3,
+            FrameCellType.right_4,
+            FrameCellType.right_5,
+        ];
+
+        private readonly FrameCellType[] _top = [
+            FrameCellType.top_1,
+            FrameCellType.top_2,
+            FrameCellType.top_3,
+            FrameCellType.top_4,
+            FrameCellType.top_5,
+        ];
 
         public FrameSealModel Config = null;
 
@@ -23,15 +53,7 @@ namespace TheDragonsPuzzleSeals.Features.Map
         public void Initialize()
         {
             if (Config == null) return;
-
-            try
-            {
-                _sprite.Texture = GD.Load<Texture2D>(Config.TexturePath);
-            }
-            catch (Exception e)
-            {
-                GD.Print("Error when loading texture " + e.Message);
-            }
+            _sprite.Texture = Config.Texture;
         }
 
         public FrameSealModel SetUp(Vector2I posCell, Vector2 pos, 
@@ -45,8 +67,6 @@ namespace TheDragonsPuzzleSeals.Features.Map
             Vector2 scale = new(newSize / textureSize.X, newSize / textureSize.Y);
             _sprite.Scale = scale;
 
-            string type = "center";
-
             Vector2 topleft  = new(distancePos, distancePos);
             Vector2 botleft  = new(distancePos, -distancePos);
             Vector2 topright = new(-distancePos, distancePos);
@@ -56,52 +76,54 @@ namespace TheDragonsPuzzleSeals.Features.Map
             Vector2 bot      = new(0, -distancePos);
             Vector2 right    = new(-distancePos, 0);
 
-            int index = _frameIndex[_rand.Next(_frameIndex.Length)];
+            Texture2D texture = TextureManager.Instance.GetFrameCellTexture(FrameCellType.center);
+
+            Texture2D botTexture = TextureManager.Instance.GetFrameCellTexture(_bot[_rand.Next(_bot.Length)]);
+            Texture2D topTexture = TextureManager.Instance.GetFrameCellTexture(_top[_rand.Next(_top.Length)]);
+            Texture2D leftTexture = TextureManager.Instance.GetFrameCellTexture(_left[_rand.Next(_left.Length)]);
+            Texture2D rightTexture = TextureManager.Instance.GetFrameCellTexture(_right[_rand.Next(_right.Length)]);
 
             if (posCell.X == 0 && posCell.Y == 0)
             {
-                type = "topleft";
+                texture = TextureManager.Instance.GetFrameCellTexture(FrameCellType.top_left);
                 pos -= topleft;
             }
-            else if ((posCell.X > 0 && posCell.X < width - 1) && posCell.Y == 0)
+            else if (posCell.X > 0 && posCell.X < width - 1 && posCell.Y == 0)
             {
-                type = "top_" + index;
+                texture = topTexture;
                 pos -= top;
             }
-            else if (posCell.X == 0 && (posCell.Y > 0 && posCell.Y < height - 1))
+            else if (posCell.X == 0 && posCell.Y > 0 && posCell.Y < height - 1)
             {
-                type = "left_" + index;
+                texture = leftTexture;
                 pos -= left;
             }
             else if (posCell.X == 0 && posCell.Y == height - 1)
             {
-                type = "botleft";
+                texture = TextureManager.Instance.GetFrameCellTexture(FrameCellType.bot_left);
                 pos -= botleft;
             }
-            else if ((posCell.X > 0 && posCell.X < width - 1) && posCell.Y == height - 1)
+            else if (posCell.X > 0 && posCell.X < width - 1 && posCell.Y == height - 1)
             {
-                type = "bot_" + index;
+                texture = botTexture;
                 pos -= bot;
             }
             else if (posCell.X == width - 1 && posCell.Y == 0)
             {
-                type = "topright";
+                texture = TextureManager.Instance.GetFrameCellTexture(FrameCellType.top_right);
                 pos -= topright;
             }
             else if (posCell.X == width - 1 && posCell.Y == height - 1)
             {
-                type = "botright";
+                texture = TextureManager.Instance.GetFrameCellTexture(FrameCellType.bot_right);
                 pos -= botright;
             }
-            else if (posCell.X == width - 1 && (posCell.Y > 0 && posCell.Y < height - 1))
+            else if (posCell.X == width - 1 && posCell.Y > 0 && posCell.Y < height - 1)
             {
-                type = "right_" + index;
+                texture = rightTexture;
                 pos -= right;
             }
-
-            string texturePath = $"res://Assets/Textures/FrameCell/{type}.png";
-
-            Config = new(texturePath, pos);
+            Config = new(texture, pos);
 
             return Config;
         }
