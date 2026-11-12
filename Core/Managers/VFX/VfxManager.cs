@@ -29,7 +29,7 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 
 					dummyVfx.GlobalPosition = Vector2.Zero;
 
-					dummyVfx.Modulate = new Color(1f, 1f, 1f, 0f);
+					dummyVfx.Modulate = new Color(1f, 1f, 1f, 1f);
 
 					AddChild(dummyVfx);
 
@@ -63,6 +63,7 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 						 RemoteTransform2D remoteTransform,
 						 Vector2? scale = null,
 						 Color? color = null,
+						 string colorString = "blue",
 						 float duration = 1.5f)
 		{
 			if(!_loadedCache.TryGetValue(type, out var scene))
@@ -92,7 +93,19 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 			if(color.HasValue)
 			{
                 SetParticleColor(vfx, "Flash", color.Value);
-                SetParticleColor(vfx, "Break", color.Value);
+			}
+
+			// Play VFX by color
+			var animPlayer = vfx.GetNodeOrNull<AnimationPlayer>("AnimationPlayer");
+			string nameAnim = "Explosion_" + colorString;
+
+			if(animPlayer != null)
+			{
+				
+				if(animPlayer.HasAnimation(nameAnim))
+				{
+					animPlayer.Play(nameAnim);
+				}
 			}
 
 			Tween tween = vfx.CreateTween();
@@ -121,11 +134,9 @@ namespace TheDragonsPuzzleSeals.Core.Managers
 		{
 			if(node is GpuParticles2D gpuP)
 			{
-				gpuP.Emitting = true;
 				gpuP.Restart();
 			} else if(node is CpuParticles2D cpuP)
 			{
-				cpuP.Emitting = true;
 				cpuP.Restart();
 			}
 

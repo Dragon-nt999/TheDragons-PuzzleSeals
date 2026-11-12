@@ -44,7 +44,8 @@ namespace TheDragonsPuzzleSeals.Features.Map
                         VfxManager.Instance.Play(VfxType.Explosion, 
                                                   seal.VfxRemote,
                                                   Vector2.One,
-                                                  seal.Model.Type.GetColor());
+                                                  seal.Model.Type.GetColor(),
+                                                  seal.Model.Type.GetStringColor());
 
                     }
                 }
