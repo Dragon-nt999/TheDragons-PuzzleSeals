@@ -31,5 +31,13 @@ namespace TheDragonsPuzzleSeals.Features.Map
             SealType.green  => new Color("#55BA64"),
             _               => new Color("#418DA2")
         };
+
+        public static string GetStringColor(this SealType type) => type switch
+        {
+            SealType.yellow => "yellow",
+            SealType.red    => "red",
+            SealType.green  => "green",
+            _               => "blue"
+        };
     }
 }

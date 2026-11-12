@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bjjmleb2yrqtu"
-path="res://.godot/imported/sprite_break.png-b5ce2f3e48a9814db587131ca86fd13d.ctex"
+uid="uid://beobbqqpcwrt6"
+path="res://.godot/imported/sprite_breaking_seal_blue.png-4ffa59f95288f86c67bd2c07e8edc8c1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Textures/VFX/sprite_break.png"
-dest_files=["res://.godot/imported/sprite_break.png-b5ce2f3e48a9814db587131ca86fd13d.ctex"]
+source_file="res://Assets/Textures/VFX/sprite_breaking_seal_blue.png"
+dest_files=["res://.godot/imported/sprite_breaking_seal_blue.png-4ffa59f95288f86c67bd2c07e8edc8c1.ctex"]
 
 [params]
 
